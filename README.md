@@ -159,7 +159,19 @@ output/
 
 ## 5 — Metrics
 
-Metrics are split into three groups. **Performance** and **Model output** are always reported. **Ground truth** metrics are computed automatically when label images are present (images only, videos are skipped). All groups are reported identically for all models.
+This repo tracks **benchmark metrics + thresholds** so you can compare models apples-to-apples on:
+
+- **200 Images** (with labels)
+- **10 Videos** (no ground truth required)
+- **Jetson performance** (NRU-51V+ / Jetson Orin NX 16GB targets)
+
+Models under test:
+
+- **SAM3**: `sam3.pt` (local weights)
+- **SAM2.1-L**: `sam2.1_l.pt` (local weights)
+- **FastSAM**: `FastSAM-x.pt` (local weights)
+- **MobileSAM**: `mobile_sam.pt` (local weights)
+- **YOLOE-26 Seg**: `yoloe-26{n|s|m|l|x}-seg.pt` (local weights)
 
 ### Performance (always reported)
 
@@ -168,32 +180,31 @@ Metrics are split into three groups. **Performance** and **Model output** are al
 | `inference_time_ms` | `time.perf_counter()` around `model.predict()`, in ms |
 | `fps`               | `1000 / inference_time_ms`                            |
 
-### Model Output (always reported)
+#### Jetson Performance targets (NRU-51V+ / Jetson Orin NX 16GB)
 
-| Metric              | How it is calculated                                                            |
-| ------------------- | ------------------------------------------------------------------------------- |
-| `road_coverage_pct` | `road pixels / total pixels × 100` — what fraction of the image was marked road |
-| `mean_confidence`   | Mean of the model's own confidence scores across all detected road instances    |
-| `num_detections`    | Count of distinct road instances returned by the model                          |
+| Metric                | Threshold |
+| --------------------- | --------- |
+| GPU Utilization       | ≤ 95%     |
+| CPU Utilization       | ≤ 80%     |
+| RAM Usage             | ≤ 80%     |
+| Image Inference Speed | ≤ 200 ms  |
+| Video Inference Speed | ≤ 25 ms   |
+| Video FPS             | ≥ 25 FPS  |
 
-### Video consistency (video only, no ground truth needed)
+#### Video benchmark thresholds (10 videos)
 
-| Metric         | How it is calculated                                                                                  |
-| -------------- | ----------------------------------------------------------------------------------------------------- |
-| `temporal_iou` | `(mask_t ∩ mask_{t-1}) / (mask_t ∪ mask_{t-1})` — frame-to-frame mask overlap; 1.0 = perfectly stable |
+| Metric                   | Threshold |
+| ------------------------ | --------- |
+| Temporal IoU             | ≥ 0.85    |
+| No-detection Rate        | ≤ 0.01    |
+| Frame-to-frame Stability | ≥ 0.90    |
 
-### Ground truth (images only, requires `test_data/labeled/`)
+#### Image benchmark thresholds (200 images)
 
-Computed by comparing the predicted mask against the hand-labelled image. Label pixels: **white (255) = road**, **black (0) = non-road**, **gray (128) = void** (excluded from all calculations).
-
-Let `TP`, `TN`, `FP`, `FN` be counts of true/false positives/negatives over all non-void pixels:
-
-| Metric           | Formula                            | What it tells you                                 |
-| ---------------- | ---------------------------------- | ------------------------------------------------- |
-| `iou`            | `TP / (TP + FP + FN)`              | Overlap between predicted and actual road area    |
-| `precision`      | `TP / (TP + FP)`                   | Of pixels called road, how many actually are road |
-| `recall`         | `TP / (TP + FN)`                   | Of actual road pixels, how many were found        |
-| `f1`             | `2 × precision × recall / (P + R)` | Harmonic mean of precision and recall             |
-| `pixel_accuracy` | `(TP + TN) / (TP + TN + FP + FN)`  | Overall per-pixel classification accuracy         |
-
-The console prints `mean / min / max` for each metric across all images, and a per-image line with `IoU` and `F1` for quick scanning.
+| Metric              | Threshold |
+| ------------------- | --------- |
+| mIoU / IoU          | ≥ 0.85    |
+| F1 Score            | ≥ 0.90    |
+| Pixel Accuracy      | ≥ 0.90    |
+| False Negative Rate | ≤ 0.08    |
+| False Positive Rate | ≤ 0.08    |

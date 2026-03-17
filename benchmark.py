@@ -85,11 +85,17 @@ MODEL_ALIASES = {
     # canonical -> itself
     "sam3": "sam3",
     "sam21": "sam21",
+    "fastsam": "fastsam",
+    "mobilesam": "mobilesam",
     "yolo26": "yolo26",
     # user-friendly
     "sam2": "sam21",
     "sam2.1": "sam21",
     "sam2.1l": "sam21",
+    "fast-sam": "fastsam",
+    "fastsam-x": "fastsam",
+    "mobile-sam": "mobilesam",
+    "mobile_sam": "mobilesam",
     "yoloe26": "yolo26",
     "yoloe-26": "yolo26",
     "yoloe-26x": "yolo26",
@@ -294,6 +300,61 @@ def _build_segmentor(args, canonical_model: str):
                     "  Put the `.pt` file in the project directory or pass `--sam3-weights path/to/sam3.pt`.\n"
                 )
             return sr.SAM3Segmentor(weights=str(wp), conf=args.conf, prompts=args.prompts)
+        if canonical_model == "fastsam":
+            wp = Path(getattr(args, "fastsam_weights", "FastSAM-x.pt"))
+            if not wp.exists():
+                raise SystemExit(
+                    "\n[ERROR] FastSAM weights not found locally.\n"
+                    f"  Expected: {wp}\n"
+                    "  Put the `.pt` file in the project directory or pass `--fastsam-weights path/to/FastSAM-x.pt`.\n"
+                )
+            # Ultralytics FastSAM uses the YOLO API for segment tasks.
+            seg = sr.YOLO26Segmentor(size=args.model_size, conf=args.conf, prompts=args.prompts)
+            from ultralytics import YOLO  # pyright: ignore[reportMissingImports]
+            print(f"[FastSAM] Loading {wp} (local file) ...")
+            seg.model = YOLO(str(wp))
+            return seg
+        if canonical_model == "mobilesam":
+            wp = Path(getattr(args, "mobilesam_weights", "mobile_sam.pt"))
+            if not wp.exists():
+                raise SystemExit(
+                    "\n[ERROR] MobileSAM weights not found locally.\n"
+                    f"  Expected: {wp}\n"
+                    "  Put the `.pt` file in the project directory or pass `--mobilesam-weights path/to/mobile_sam.pt`.\n"
+                )
+            # MobileSAM is a SAM-style model; use Ultralytics SAM wrapper.
+            from ultralytics import SAM  # pyright: ignore[reportMissingImports]
+            print(f"[MobileSAM] Loading {wp} (local file) ...")
+            model = SAM(str(wp))
+
+            class _MobileSAMSeg:
+                def __init__(self, m, conf: float):
+                    self.model = m
+                    self.conf = conf
+
+                def infer(self, source):
+                    # Use the same bottom-centre point prompt as SAM2.1 for road.
+                    if isinstance(source, np.ndarray):
+                        frame = source
+                    else:
+                        frame = sr.cv2.imread(str(source))
+                        if frame is None:
+                            return None, 0.0
+                    h, w = frame.shape[:2]
+                    cx = int(w * sr.SAM21Segmentor.POINT_X)
+                    cy = int(h * sr.SAM21Segmentor.POINT_Y)
+                    t0 = time.perf_counter()
+                    res = self.model.predict(
+                        frame,
+                        points=[[cx, cy]],
+                        labels=[1],
+                        conf=self.conf,
+                        verbose=False,
+                    )
+                    t_ms = (time.perf_counter() - t0) * 1000.0
+                    return (res[0] if res else None), t_ms
+
+            return _MobileSAMSeg(model, args.conf)
         raise SystemExit(f"[ERROR] Unknown model: {args.model!r} (canonical: {canonical_model!r})")
     except ModuleNotFoundError as e:
         missing = getattr(e, "name", None) or str(e)
@@ -788,6 +849,8 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Path to a local YOLOE-26 .pt weights file (disables any auto-download behavior).",
     )
+    run.add_argument("--fastsam-weights", default="FastSAM-x.pt", help="Path to local FastSAM weights .pt.")
+    run.add_argument("--mobilesam-weights", default="mobile_sam.pt", help="Path to local MobileSAM weights .pt.")
     run.add_argument("--sam3-weights", default="sam3.pt", help="Path to sam3.pt.")
     run.add_argument("--sam21-weights", default="sam2.1_l.pt", help="Path to sam2.1_l.pt.")
     run.add_argument(
@@ -824,6 +887,8 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Path to a local YOLOE-26 .pt weights file (disables any auto-download behavior).",
     )
+    allcmd.add_argument("--fastsam-weights", default="FastSAM-x.pt", help="Path to local FastSAM weights .pt.")
+    allcmd.add_argument("--mobilesam-weights", default="mobile_sam.pt", help="Path to local MobileSAM weights .pt.")
     allcmd.add_argument("--sam3-weights", default="sam3.pt", help="Path to sam3.pt.")
     allcmd.add_argument("--sam21-weights", default="sam2.1_l.pt", help="Path to sam2.1_l.pt.")
     allcmd.add_argument(
