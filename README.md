@@ -159,10 +159,10 @@ output/
 
 ## 5 — Metrics
 
-This repo tracks **benchmark metrics + thresholds** so you can compare models apples-to-apples on:
+This repository tracks **benchmark metrics + thresholds** so you can compare models apples-to-apples on:
 
 - **200 Images** (with labels)
-- **10 Videos** (no ground truth required)
+- **17 Videos** (no ground truth required)
 - **Jetson performance** (NRU-51V+ / Jetson Orin NX 16GB targets)
 
 Models under test:

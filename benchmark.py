@@ -52,26 +52,26 @@ JETSON_MODEL_HINTS = ("jetson", "orin", "nvidia")
 
 
 IMAGE_THRESHOLDS = {
-    "iou": 0.85,              # mIoU / IoU >= 0.85
-    "f1": 0.90,               # F1 >= 0.90
-    "pixel_accuracy": 0.90,   # pixel accuracy >= 0.90
-    "false_negative_rate": 0.08,  # <= 0.08
-    "false_positive_rate": 0.08,  # <= 0.08
+    "iou": 0.85,
+    "f1": 0.90,
+    "pixel_accuracy": 0.90,
+    "false_negative_rate": 0.08,
+    "false_positive_rate": 0.08,
 }
 
 VIDEO_THRESHOLDS = {
-    "temporal_iou": 0.85,          # >= 0.85
-    "no_detection_rate": 0.01,     # <= 0.01
-    "frame_to_frame_stability": 0.90,  # >= 0.90 (alias of temporal IoU here)
+    "temporal_iou": 0.85,
+    "no_detection_rate": 0.01,
+    "frame_to_frame_stability": 0.90,
 }
 
 JETSON_THRESHOLDS = {
-    "gpu_utilization_pct": 95.0,     # <= 95%
-    "cpu_utilization_pct": 80.0,     # <= 80%
-    "ram_usage_pct": 80.0,           # <= 80%
-    "image_inference_speed_ms": 200.0,  # <= 200 ms
-    "video_inference_speed_ms": 25.0,   # <= 25 ms
-    "video_fps": 25.0,               # >= 25 FPS
+    "gpu_utilization_pct": 95.0,
+    "cpu_utilization_pct": 80.0,
+    "ram_usage_pct": 80.0,
+    "image_inference_speed_ms": 200.0,
+    "video_inference_speed_ms": 25.0,
+    "video_fps": 25.0,
 }
 
 
@@ -82,13 +82,11 @@ class ModelSpec:
 
 
 MODEL_ALIASES = {
-    # canonical -> itself
     "sam3": "sam3",
     "sam21": "sam21",
     "fastsam": "fastsam",
     "mobilesam": "mobilesam",
     "yolo26": "yolo26",
-    # user-friendly
     "sam2": "sam21",
     "sam2.1": "sam21",
     "sam2.1l": "sam21",
@@ -220,8 +218,6 @@ def prepare_benchmark_images(
     chosen = pairs[: min(n_images, len(pairs))]
 
     for raw, lab in chosen:
-        # Normalize label naming to match segment_road.py convention:
-        # raw/foo.png -> labeled/foo_labeled.png
         labeled_name = f"{raw.stem}_labeled{raw.suffix}"
         _copy_pair(
             raw,
@@ -718,7 +714,7 @@ def write_benchmark_csv(*, out_csv: Path, model: str, image_report: dict, video_
         }
     )
 
-    # Videos (10 videos)
+    # Videos (17 videos)
     rows.append(
         {
             "section": "videos",
