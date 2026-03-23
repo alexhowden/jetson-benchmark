@@ -1,0 +1,15 @@
+model,section,metric,value,threshold,pass
+fastsam,images,mIoU / IoU,0.4258935,0.85,False
+fastsam,images,F1 Score,0.5435335000000001,0.9,False
+fastsam,images,Pixel Accuracy,0.651593,0.9,False
+fastsam,images,False Negative Rate,0.26660180069052675,0.08,False
+fastsam,images,False Positive Rate,0.38166642532322653,0.08,False
+fastsam,videos,Temporal IoU,0.872684639016897,0.85,True
+fastsam,videos,No-detection Rate,0.0,0.01,True
+fastsam,videos,Frame-to-frame Stability,0.872684639016897,0.9,False
+fastsam,jetson,GPU Utilization (%),,95.0,
+fastsam,jetson,CPU Utilization (%),,80.0,
+fastsam,jetson,RAM Usage (%),,80.0,
+fastsam,jetson,Image Inference Speed (ms),,200.0,
+fastsam,jetson,Video Inference Speed (ms),480.8851577468387,25.0,
+fastsam,jetson,Video FPS,2.074556137437732,25.0,

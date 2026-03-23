@@ -8,3 +8,4 @@ test_data
 *.jpg
 __pycache__
 datasets
+.DS_Store

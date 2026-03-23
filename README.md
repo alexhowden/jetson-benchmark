@@ -14,34 +14,73 @@
 
 ---
 
-## 1 — Environment Setup (Conda)
+## 1 — Environment Setup (Jetson venv)
 
-### 1a. Create a conda environment
-
-```bash
-conda create -n offroad-seg python=3.11 -y
-conda activate offroad-seg
-```
-
-### 1b. Install PyTorch
-
-**CPU only:**
+### 1a. Create and activate a venv
 
 ```bash
-conda install pytorch torchvision cpuonly -c pytorch -y
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
 ```
 
-**GPU (CUDA 12.1) — recommended for SAM3 and SAM2.1-L:**
+### 1b. Install Jetson PyTorch (CUDA 12.2)
+
+Use NVIDIA's Jetson PyTorch thread to get the exact wheel URL and wheel filename for your JetPack/CUDA/Python combo:
+
+- https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048
+
+For JetPack 6.x (CUDA 12.2), torch 2.3.0, use this flow:
 
 ```bash
-conda install pytorch torchvision pytorch-cuda=12.1 -c pytorch -c nvidia -y
+# 1) install prerequisites
+sudo apt-get update
+sudo apt-get install -y libopenblas-base libopenmpi-dev libomp-dev libjpeg-dev zlib1g-dev libpython3-dev libavcodec-dev libavformat-dev libswscale-dev
+pip3 install --upgrade pip
+pip3 install 'Cython<3' numpy
+
+# 2) install PyTorch 2.3.0 wheel
+wget https://nvidia.box.com/shared/static/47f7220m09sh0af89p67u7vsu8id98be.whl -O torch-2.3.0-cp310-cp310-linux_aarch64.whl
+pip3 install torch-2.3.0-cp310-cp310-linux_aarch64.whl
+
+# 3) install torchvision 0.18.0 from source
+git clone --branch v0.18.0 https://github.com/pytorch/vision torchvision
+cd torchvision
+export BUILD_VERSION=0.18.0
+python3 setup.py install --user
+cd ..
+
+# 4) install torchaudio 2.3.0 wheel
+wget https://nvidia.box.com/shared/static/5412702z8vubun372138x1bms9xuncl9.whl -O torchaudio-2.3.0+952ea74-cp310-cp310-linux_aarch64.whl
+pip3 install torchaudio-2.3.0+952ea74-cp310-cp310-linux_aarch64.whl
+
+# 5) verify versions and CUDA availability
+python3 -c "import torch, torchvision, torchaudio; print('PyTorch version:', torch.__version__); print('CUDA available:', torch.cuda.is_available()); print('torchvision version:', torchvision.__version__); print('torchaudio version:', torchaudio.__version__)"
 ```
 
-### 1c. Install the remaining dependencies
+Notes:
+
+- These wheel links come from the NVIDIA Jetson PyTorch forum post for torch 2.3.0 on JetPack 6.x.
+- If NVIDIA rotates links or updates wheel names, use the latest links from the forum thread above.
+- If you use the project venv from section 1a, use venv executables instead of system ones:
 
 ```bash
-pip install -r requirements.txt
+python -m pip install --upgrade pip
+python -m pip install 'Cython<3' numpy
+python -m pip install torch-2.3.0-cp310-cp310-linux_aarch64.whl
+python -m pip install torchaudio-2.3.0+952ea74-cp310-cp310-linux_aarch64.whl
+python -c "import torch, torchvision, torchaudio; print(torch.__version__, torchvision.__version__, torchaudio.__version__, torch.cuda.is_available())"
 ```
+
+### 1c. Install remaining dependencies without replacing torch
+
+Some pip installs may try to replace Jetson-specific torch builds. If that happens, install dependencies with no dependency resolution and then add missing packages manually as needed:
+
+```bash
+pip install --no-deps -r requirements.txt
+```
+
+If torch gets replaced accidentally, reinstall torch from the NVIDIA Jetson thread above.
 
 > **Note on the CLIP package (SAM3 only):**
 > If you already have a different `clip` package installed, replace it:
@@ -99,6 +138,43 @@ python segment_road.py --model sam21  --input test_data/aa.mp4
 python segment_road.py --model sam3   --input test_data/aa.mp4
 ```
 
+### Video writer backend (end-to-end output path)
+
+```bash
+# auto: uses GStreamer/NVENC on Jetson when available, falls back to OpenCV
+python segment_road.py --model yolo26 --input test_data/aa.mp4 --video-writer auto
+
+# force OpenCV writer
+python segment_road.py --model yolo26 --input test_data/aa.mp4 --video-writer opencv
+
+# force GStreamer writer
+python segment_road.py --model yolo26 --input test_data/aa.mp4 --video-writer gstreamer
+```
+
+### Video capture backend (GPU decode on Jetson)
+
+```bash
+# auto: uses GStreamer/NVDEC on Jetson when available, falls back to OpenCV
+python segment_road.py --model yolo26 --input test_data/aa.mp4 --video-capture auto
+
+# force OpenCV capture
+python segment_road.py --model yolo26 --input test_data/aa.mp4 --video-capture opencv
+
+# force GStreamer capture
+python segment_road.py --model yolo26 --input test_data/aa.mp4 --video-capture gstreamer
+```
+
+### YOLO TensorRT backend
+
+```bash
+# Use TensorRT backend (exports engine on first run if needed)
+python segment_road.py --model yolo26 --input test_data/ --yolo-backend tensorrt
+
+# Use a prebuilt TensorRT engine explicitly
+python segment_road.py --model yolo26 --input test_data/ \
+  --yolo-backend tensorrt --yolo-engine /path/to/yoloe-26x-seg.engine
+```
+
 ### Save a JSON metrics report
 
 ```bash
@@ -119,9 +195,33 @@ Reports are saved as `output/<model>/metrics_<model>.json`.
 | `--conf`          | `0.25`        | Detection confidence threshold                                        |
 | `--prompts`       | built-in set  | Custom text prompts _(YOLO26 and SAM3 only — ignored for SAM2.1)_     |
 | `--model-size`    | `x`           | YOLOE-26 size: `n` / `s` / `m` / `l` / `x` _(ignored for SAM models)_ |
+| `--yolo-weights`  | auto          | Optional YOLO weights/engine path                                     |
+| `--yolo-backend`  | `pytorch`     | YOLO backend: `pytorch` / `tensorrt`                                  |
+| `--yolo-engine`   | none          | TensorRT engine path (used with `--yolo-backend tensorrt`)            |
 | `--sam3-weights`  | `sam3.pt`     | Path to SAM3 weights _(ignored for YOLO26 and SAM2.1)_                |
 | `--sam21-weights` | `sam2.1_l.pt` | Path to SAM2.1 weights — auto-downloaded if not present               |
+| `--video-writer`  | `auto`        | Video output backend: `auto` / `opencv` / `gstreamer`                 |
+| `--video-capture` | `auto`        | Video input backend: `auto` / `opencv` / `gstreamer`                  |
 | `--report`        | off           | Save JSON metrics report to the model output directory                |
+
+### Model and Flag Compatibility
+
+| Option            | yolo26 | sam3 | sam21 |
+| ----------------- | ------ | ---- | ----- |
+| `--prompts`       | Yes    | Yes  | No    |
+| `--model-size`    | Yes    | No   | No    |
+| `--yolo-weights`  | Yes    | No   | No    |
+| `--yolo-backend`  | Yes    | No   | No    |
+| `--yolo-engine`   | Yes    | No   | No    |
+| `--sam3-weights`  | No     | Yes  | No    |
+| `--sam21-weights` | No     | No   | Yes   |
+| `--video-capture` | Yes    | Yes  | Yes   |
+| `--video-writer`  | Yes    | Yes  | Yes   |
+
+Notes:
+
+- `--yolo-backend tensorrt` and `--yolo-engine` are YOLO-only in this repo.
+- SAM models currently run through their existing Ultralytics/PyTorch path.
 
 ### Custom text prompts (YOLO26 / SAM3 only)
 
@@ -208,3 +308,64 @@ Models under test:
 | Pixel Accuracy      | ≥ 0.90    |
 | False Negative Rate | ≤ 0.08    |
 | False Positive Rate | ≤ 0.08    |
+
+---
+
+## 6 — Benchmark Automation
+
+Run all configured models in one command:
+
+```bash
+bash scripts/run_all_benchmarks.sh
+```
+
+Useful options:
+
+```bash
+# Show available flags
+bash scripts/run_all_benchmarks.sh --help
+
+# Use OpenCV writer instead of auto
+bash scripts/run_all_benchmarks.sh --video-writer opencv
+
+# Use GPU decode/capture path
+bash scripts/run_all_benchmarks.sh --video-capture gstreamer
+
+# Run only YOLO TensorRT path (no PyTorch YOLO baseline)
+bash scripts/run_all_benchmarks.sh --yolo-mode tensorrt
+
+# Run only YOLO PyTorch path (no TensorRT YOLO comparison)
+bash scripts/run_all_benchmarks.sh --yolo-mode pytorch
+
+# Skip preparation (if benchmark/images and benchmark/videos are already ready)
+bash scripts/run_all_benchmarks.sh --skip-prepare
+```
+
+By default, the script runs:
+
+- yolo26 (x, pytorch)
+- yolo26 (n, pytorch)
+- yolo26 (x, tensorrt)
+- yolo26 (n, tensorrt)
+- sam21
+- sam3
+- fastsam
+- mobilesam
+
+Jetson-first defaults are enabled out of the box:
+
+- `--hardware jetson`
+- `--yolo-mode compare` (runs YOLO pytorch + tensorrt side by side)
+- `--video-capture auto` and `--video-writer auto` (Jetson uses GStreamer when available)
+- output saving disabled by default for best throughput
+
+For laptop/desktop runs, override as needed, e.g.:
+
+```bash
+bash scripts/run_all_benchmarks.sh --hardware desktop --yolo-mode pytorch --save-outputs
+
+# Keep side-by-side YOLO comparison, but save outputs
+bash scripts/run_all_benchmarks.sh --save-outputs
+```
+
+The script uses `benchmark.py all` so outputs and metrics remain end-to-end (inference + overlay + write).

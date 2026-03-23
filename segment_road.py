@@ -58,6 +58,69 @@ MASK_BGR = (34, 139, 34)
 CONTOUR_BGR = (0, 255, 255)
 MASK_ALPHA = 0.40
 HUD_ALPHA = 0.55
+JETSON_MODEL_HINTS = ("jetson", "orin", "nvidia")
+
+
+def _read_text_if_exists(p: Path):
+    try:
+        if p.exists():
+            return p.read_text(errors="ignore").strip()
+    except Exception:
+        return None
+    return None
+
+
+def detect_jetson() -> bool:
+    """Best-effort runtime detection for NVIDIA Jetson devices."""
+    model = _read_text_if_exists(Path("/proc/device-tree/model"))
+    if model and any(h in model.lower() for h in JETSON_MODEL_HINTS):
+        return True
+    release = _read_text_if_exists(Path("/etc/nv_tegra_release"))
+    if release:
+        return True
+    return False
+
+
+def build_video_writer(out_path: Path, fps: float, size: tuple[int, int], backend: str = "auto"):
+    """Create a VideoWriter. Prefers Jetson NVENC via GStreamer when requested."""
+    w, h = size
+
+    use_gstreamer = backend == "gstreamer" or (backend == "auto" and detect_jetson())
+    if use_gstreamer:
+        location = str(out_path.resolve()).replace('"', '\\"')
+        pipeline = (
+            "appsrc ! videoconvert ! video/x-raw,format=BGR ! "
+            "nvvidconv ! nvv4l2h264enc preset-level=1 insert-sps-pps=true idrinterval=30 bitrate=8000000 ! "
+            f"h264parse ! qtmux ! filesink location=\"{location}\" sync=false"
+        )
+        gst_writer = cv2.VideoWriter(pipeline, cv2.CAP_GSTREAMER, 0, fps, (w, h))
+        if gst_writer.isOpened():
+            return gst_writer, "gstreamer"
+        print("  [WARN] GStreamer/NVENC writer unavailable. Falling back to OpenCV mp4v writer.")
+
+    opencv_writer = cv2.VideoWriter(str(out_path), cv2.VideoWriter_fourcc(*"mp4v"), fps, (w, h))
+    return opencv_writer, "opencv"
+
+
+def build_video_capture(video_path: Path, backend: str = "auto"):
+    """Create a VideoCapture. Prefers Jetson NVDEC via GStreamer when requested."""
+    use_gstreamer = backend == "gstreamer" or (backend == "auto" and detect_jetson())
+    if use_gstreamer:
+        location = str(video_path.resolve()).replace('"', '\\"')
+        pipeline = (
+            f"filesrc location=\"{location}\" ! "
+            "qtdemux ! h264parse ! nvv4l2decoder ! "
+            "nvvidconv ! video/x-raw,format=BGRx ! "
+            "videoconvert ! video/x-raw,format=BGR ! "
+            "appsink drop=true sync=false"
+        )
+        gst_cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
+        if gst_cap.isOpened():
+            return gst_cap, "gstreamer"
+        print("  [WARN] GStreamer/NVDEC capture unavailable. Falling back to OpenCV capture.")
+
+    opencv_cap = cv2.VideoCapture(str(video_path))
+    return opencv_cap, "opencv"
 
 def collect_inputs(input_path: str):
     """
@@ -71,15 +134,15 @@ def collect_inputs(input_path: str):
 
     if p.is_file():
         ext = p.suffix.lower()
-    
+
         if ext in IMAGE_EXTS:
             return [p], [], None
-    
+
         if ext in VIDEO_EXTS:
             return [], [p], None
-    
+
         sys.exit(f"[ERROR] Unsupported file type: {ext}")
-    
+
     if p.is_dir():
         raw_dir = p / "raw"
         label_dir = p / "labeled"
@@ -89,7 +152,7 @@ def collect_inputs(input_path: str):
         vids = sorted(f for f in src_dir.iterdir() if f.suffix.lower() in VIDEO_EXTS)
 
         return imgs, vids, ldir
-    
+
     sys.exit(f"[ERROR] Path not found: {input_path}")
 
 
@@ -117,10 +180,10 @@ def load_gt_mask(label_path: Path):
     void_mask : np.ndarray [H, W] bool   True = ignore this pixel
     """
     label = cv2.imread(str(label_path))
-    
+
     if label is None:
         return None, None
-    
+
     gray = cv2.cvtColor(label, cv2.COLOR_BGR2GRAY) if label.ndim == 3 else label
     gt_mask = gray > 200
     void_mask = (gray > 50) & (gray < 200)
@@ -214,15 +277,15 @@ def extract_masks(result, h: int, w: int):
 
         if m_np.shape != (h, w):
             m_np = cv2.resize(m_np, (w, h), interpolation=cv2.INTER_NEAREST)
-        
+
         combined |= m_np.astype(bool)
         conf = 1.0
-        
+
         if result.boxes is not None and i < len(result.boxes.conf):
             conf = float(result.boxes.conf[i].cpu())
         elif (hasattr(result.masks, "conf") and result.masks.conf is not None and i < len(result.masks.conf)):
             conf = float(result.masks.conf[i].cpu())
-        
+
         confs.append(conf)
 
     return combined, confs
@@ -230,15 +293,20 @@ def extract_masks(result, h: int, w: int):
 
 def overlay_mask(frame: np.ndarray, mask: np.ndarray) -> np.ndarray:
     """Apply semi-transparent green overlay and cyan contour boundary."""
-    out = frame.copy()
-
     if not mask.any():
-        return out
-    
-    color_layer = frame.copy()
-    color_layer[mask] = MASK_BGR
-    out = cv2.addWeighted(color_layer, MASK_ALPHA, out, 1.0 - MASK_ALPHA, 0)
-    contours, _ = cv2.findContours(mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        return frame.copy()
+
+    out = frame.copy()
+    mask_u8 = mask.astype(np.uint8)
+    x, y, w, h = cv2.boundingRect(mask_u8)
+    if w > 0 and h > 0:
+        roi = out[y : y + h, x : x + w]
+        roi_mask = mask[y : y + h, x : x + w]
+        roi_overlay = roi.copy()
+        roi_overlay[roi_mask] = MASK_BGR
+        roi[:] = cv2.addWeighted(roi_overlay, MASK_ALPHA, roi, 1.0 - MASK_ALPHA, 0)
+
+    contours, _ = cv2.findContours(mask_u8, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cv2.drawContours(out, contours, -1, CONTOUR_BGR, 2)
 
     return out
@@ -255,7 +323,7 @@ def draw_hud(frame: np.ndarray, metrics: dict, model_label: str) -> np.ndarray:
 
     if "temporal_iou" in metrics:
         lines.append(f"T-IoU : {metrics['temporal_iou']:.3f}")
-    
+
     if "iou" in metrics:
         lines.append(f"IoU   : {metrics['iou']:.3f}   F1: {metrics['f1']:.3f}")
         lines.append(f"Prec  : {metrics['precision']:.3f}   Rec: {metrics['recall']:.3f}")
@@ -264,9 +332,14 @@ def draw_hud(frame: np.ndarray, metrics: dict, model_label: str) -> np.ndarray:
     rect_h = len(lines) * line_h + pad * 2
     rect_w = 370
 
-    overlay = frame.copy()
-    cv2.rectangle(overlay, (0, 0), (rect_w, rect_h), (0, 0, 0), -1)
-    frame = cv2.addWeighted(overlay, HUD_ALPHA, frame, 1.0 - HUD_ALPHA, 0)
+    h, w = frame.shape[:2]
+    x2 = min(rect_w, w)
+    y2 = min(rect_h, h)
+    if x2 > 0 and y2 > 0:
+        roi = frame[:y2, :x2]
+        overlay = roi.copy()
+        cv2.rectangle(overlay, (0, 0), (x2, y2), (0, 0, 0), -1)
+        roi[:] = cv2.addWeighted(overlay, HUD_ALPHA, roi, 1.0 - HUD_ALPHA, 0)
 
     for i, ln in enumerate(lines):
         y = pad + (i + 1) * line_h - 4
@@ -308,7 +381,7 @@ def compute_metrics(
         inter = int((mask & prev_mask).sum())
         union = int((mask | prev_mask).sum())
         m["temporal_iou"] = round(inter / union, 4) if union > 0 else 1.0
-    
+
     return m
 
 
@@ -326,12 +399,12 @@ def print_summary(all_m: list, model_name: str, label: str):
 
         if not vals_exist:
             return
-        
+
         print(f"  -- {title} --")
-        
+
         for k in keys:
             vals = [m[k] for m in all_m if k in m]
-        
+
             if vals:
                 print(f"  {k:{col_w}}  {np.mean(vals):>8.3f}  {np.min(vals):>8.3f}  {np.max(vals):>8.3f}")
 
@@ -355,15 +428,42 @@ class YOLO26Segmentor:
     Uses Ultralytics YOLOE-26-seg with text prompts, so it works on arbitrary
     off-road road concepts without any fine-tuning.
     """
-    def __init__(self, size: str = "x", conf: float = 0.25, prompts: list = None):
+    def __init__(
+        self,
+        size: str = "x",
+        conf: float = 0.25,
+        prompts: list = None,
+        weights: str | None = None,
+        backend: str = "pytorch",
+        engine: str | None = None,
+    ):
         from ultralytics import YOLO
 
-        name = f"yoloe-26{size}-seg.pt"
-        print(f"[YOLO26] Loading {name} (auto-download if not cached) ...")
-        self.model = YOLO(name)
+        name = weights or f"yoloe-26{size}-seg.pt"
+        backend = backend.lower().strip()
+
+        if backend == "tensorrt":
+            base = YOLO(name)
+            engine_path = Path(engine) if engine else Path(str(name)).with_suffix(".engine")
+            if engine_path.exists():
+                print(f"[YOLO26] Loading TensorRT engine {engine_path} ...")
+                self.model = YOLO(str(engine_path))
+            else:
+                print(f"[YOLO26] Exporting TensorRT engine from {name} (first run may take time) ...")
+                exported = base.export(format="engine", half=True)
+                exported_path = Path(str(exported))
+                print(f"[YOLO26] Loading TensorRT engine {exported_path} ...")
+                self.model = YOLO(str(exported_path))
+        else:
+            print(f"[YOLO26] Loading {name} (auto-download if not cached) ...")
+            self.model = YOLO(name)
+
         self.conf = conf
         self.prompts = prompts or DEFAULT_PROMPTS
-        self.model.set_classes(self.prompts)
+        try:
+            self.model.set_classes(self.prompts)
+        except Exception as e:
+            print(f"[YOLO26] [WARN] Could not set text classes on current backend: {e}")
         # YOLOE with text prompts uses a CLIP text encoder that stays in float32,
         # so half=True causes a dtype mismatch. Keep full precision.
         print(f"[YOLO26] Text classes : {self.prompts}")
@@ -478,8 +578,8 @@ class SAM21Segmentor:
         return (res[0] if res else None), t_ms
 
 
-def run_image(seg, img_path: Path, out_dir: Path, model_name: str, label_dir=None):
-    """Segment a single image. Saves annotated output, returns metrics dict."""
+def run_image(seg, img_path: Path, out_dir: Path, model_name: str, label_dir=None, return_mask: bool = False):
+    """Segment a single image. Saves annotated output, returns metrics dict (and optionally mask)."""
     img = cv2.imread(str(img_path))
 
     if img is None:
@@ -495,10 +595,10 @@ def run_image(seg, img_path: Path, out_dir: Path, model_name: str, label_dir=Non
 
     if label_dir is not None:
         lp = find_label(img_path, label_dir)
-    
+
         if lp:
             gt_mask, void_mask = load_gt_mask(lp)
-    
+
             if gt_mask is not None:
                 m.update(compute_gt_metrics(mask, gt_mask, void_mask))
         else:
@@ -519,20 +619,30 @@ def run_image(seg, img_path: Path, out_dir: Path, model_name: str, label_dir=Non
         f"{gt_str}  → {out.name}"
     )
 
+    if return_mask:
+        return m, mask
+
     return m
 
 
-def run_video(seg, vid_path: Path, out_dir: Path, model_name: str) -> list:
+def run_video(
+    seg,
+    vid_path: Path,
+    out_dir: Path,
+    model_name: str,
+    video_writer: str = "auto",
+    video_capture: str = "auto",
+) -> list:
     """
     Segment a video. Saves annotated MP4 output.
     Returns a list of per-frame metrics dicts.
     """
-    probe = cv2.VideoCapture(str(vid_path))
-    
+    probe, capture_backend = build_video_capture(vid_path, backend=video_capture)
+
     if not probe.isOpened():
         print(f"  [WARN] Cannot open: {vid_path.name}")
         return []
-    
+
     src_fps  = probe.get(cv2.CAP_PROP_FPS) or 25.0
     W = int(probe.get(cv2.CAP_PROP_FRAME_WIDTH))
     H = int(probe.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -540,11 +650,24 @@ def run_video(seg, vid_path: Path, out_dir: Path, model_name: str) -> list:
     probe.release()
 
     out_path = out_dir / f"{vid_path.stem}_{model_name}_road.mp4"
-    writer = cv2.VideoWriter(str(out_path), cv2.VideoWriter_fourcc(*"mp4v"), src_fps, (W, H))
-    print(f"\n  [{model_name.upper()}] {vid_path.name}  ({W}×{H}  {src_fps:.1f} fps  {n_frames} frames)")
+    writer, writer_backend = build_video_writer(out_path, src_fps, (W, H), backend=video_writer)
+    print(
+        f"\n  [{model_name.upper()}] {vid_path.name}  "
+        f"({W}×{H}  {src_fps:.1f} fps  {n_frames} frames)  "
+        f"capture={capture_backend}  writer={writer_backend}"
+    )
+
+    if not writer.isOpened():
+        print(f"  [WARN] Cannot open output writer for: {out_path.name}")
+        return []
 
     all_m, prev_mask, fi = [], None, 0
-    cap = cv2.VideoCapture(str(vid_path))
+    cap, _ = build_video_capture(vid_path, backend=video_capture)
+
+    if not cap.isOpened():
+        print(f"  [WARN] Cannot open input capture for: {vid_path.name}")
+        writer.release()
+        return []
 
     while True:
         ret, frame = cap.read()
@@ -575,7 +698,7 @@ def run_video(seg, vid_path: Path, out_dir: Path, model_name: str) -> list:
     cap.release()
     writer.release()
     print(f"  Saved: {out_path.name}  ({fi} frames processed)")
-    
+
     return all_m
 
 def build_parser() -> argparse.ArgumentParser:
@@ -609,12 +732,38 @@ def build_parser() -> argparse.ArgumentParser:
         help="YOLOE-26 model size variant               [default: x, ignored for sam3]",
     )
     p.add_argument(
+        "--yolo-weights", default=None,
+        help="Path to local YOLO weights/engine (optional).",
+    )
+    p.add_argument(
+        "--yolo-backend",
+        default="pytorch",
+        choices=["pytorch", "tensorrt"],
+        help="YOLO inference backend: pytorch or tensorrt.",
+    )
+    p.add_argument(
+        "--yolo-engine", default=None,
+        help="Path to TensorRT .engine file (used when --yolo-backend tensorrt).",
+    )
+    p.add_argument(
         "--sam3-weights", default="sam3.pt",
         help="Path to sam3.pt weights file              [default: sam3.pt]",
     )
     p.add_argument(
         "--sam21-weights", default="sam2.1_l.pt",
         help="Path to SAM 2.1 weights (auto-downloaded) [default: sam2.1_l.pt]",
+    )
+    p.add_argument(
+        "--video-writer",
+        default="auto",
+        choices=["auto", "opencv", "gstreamer"],
+        help="Video writer backend: auto (Jetson->GStreamer), opencv, or gstreamer.",
+    )
+    p.add_argument(
+        "--video-capture",
+        default="auto",
+        choices=["auto", "opencv", "gstreamer"],
+        help="Video capture backend: auto (Jetson->GStreamer), opencv, or gstreamer.",
     )
     p.add_argument(
         "--report", action="store_true",
@@ -646,7 +795,14 @@ def main():
         sys.exit("[ERROR] No supported image/video files found in the input path.")
 
     if args.model == "yolo26":
-        seg = YOLO26Segmentor(size=args.model_size, conf=args.conf, prompts=args.prompts)
+        seg = YOLO26Segmentor(
+            size=args.model_size,
+            conf=args.conf,
+            prompts=args.prompts,
+            weights=args.yolo_weights,
+            backend=args.yolo_backend,
+            engine=args.yolo_engine,
+        )
     elif args.model == "sam21":
         seg = SAM21Segmentor(weights=args.sam21_weights, conf=args.conf)
     else:
@@ -673,7 +829,14 @@ def main():
         print(f"\n[Videos]")
 
         for p in videos:
-            vm = run_video(seg, p, out_dir, args.model)
+            vm = run_video(
+                seg,
+                p,
+                out_dir,
+                args.model,
+                video_writer=args.video_writer,
+                video_capture=args.video_capture,
+            )
             report["videos"][p.name] = vm
 
             if vm:

@@ -251,33 +251,14 @@ def _canonical_model(model: str) -> str:
 def _build_segmentor(args, canonical_model: str):
     try:
         if canonical_model == "yolo26":
-            weights = getattr(args, "yolo_weights", None)
-            if not weights:
-                weights = f"yoloe-26{args.model_size}-seg.pt"
-            wp = Path(weights)
-            if not wp.exists():
-                raise SystemExit(
-                    "\n[ERROR] YOLOE-26 weights not found locally.\n"
-                    f"  Expected: {wp}\n"
-                    "  Put the `.pt` file in the project directory or pass `--yolo-weights path/to/weights.pt`.\n"
-                )
-            # YOLO26Segmentor expects a size, but internally it constructs the filename.
-            # To force local-only weights, temporarily point CWD filename via model-size mapping.
-            # If a custom path is provided, set model-size based on filename and rely on Ultralytics loading it.
-            if getattr(args, "yolo_weights", None):
-                # Use the explicit path by instantiating Ultralytics YOLO directly via segment_road's class logic.
-                # We keep the public interface stable by swapping the expected filename into place.
-                # (Ultralytics accepts paths; segment_road currently passes a name, so we override by setting size="x"
-                #  and ensuring the filename we want is used.)
-                # Easiest + robust: call Ultralytics here and mimic YOLO26Segmentor behavior.
-                print(f"[YOLO26] Loading {wp} (local file) ...")
-                seg = sr.YOLO26Segmentor(size=args.model_size, conf=args.conf, prompts=args.prompts)
-                # Local import so environments without ultralytics can still use prepare, etc.
-                from ultralytics import YOLO  # pyright: ignore[reportMissingImports]
-                seg.model = YOLO(str(wp))
-                seg.model.set_classes(seg.prompts)
-                return seg
-            return sr.YOLO26Segmentor(size=args.model_size, conf=args.conf, prompts=args.prompts)
+            return sr.YOLO26Segmentor(
+                size=args.model_size,
+                conf=args.conf,
+                prompts=args.prompts,
+                weights=getattr(args, "yolo_weights", None),
+                backend=getattr(args, "yolo_backend", "pytorch"),
+                engine=getattr(args, "yolo_engine", None),
+            )
         if canonical_model == "sam21":
             wp = Path(args.sam21_weights)
             if not wp.exists():
@@ -440,12 +421,12 @@ def _iter_benchmark_videos() -> list[Path]:
     return sorted([p for p in BENCH_VIDEOS.iterdir() if p.is_file() and p.suffix.lower() in sr.VIDEO_EXTS])
 
 
-def _run_video_metrics_only(seg, vid_path: Path) -> list[dict]:
+def _run_video_metrics_only(seg, vid_path: Path, video_capture: str = "auto") -> list[dict]:
     """
     Metrics-only video processing (no annotated MP4 output).
     Returns list of per-frame metric dicts including temporal_iou.
     """
-    cap = sr.cv2.VideoCapture(str(vid_path))
+    cap, capture_backend = sr.build_video_capture(vid_path, backend=video_capture)
     if not cap.isOpened():
         print(f"  [WARN] Cannot open: {vid_path.name}")
         return []
@@ -455,7 +436,10 @@ def _run_video_metrics_only(seg, vid_path: Path) -> list[dict]:
     n_frames = int(cap.get(sr.cv2.CAP_PROP_FRAME_COUNT)) or 0
     src_fps = float(cap.get(sr.cv2.CAP_PROP_FPS) or 0.0)
 
-    print(f"\n  [VIDEO] {vid_path.name}  ({W}×{H}  {src_fps:.1f} fps  {n_frames} frames)")
+    print(
+        f"\n  [VIDEO] {vid_path.name}  ({W}×{H}  {src_fps:.1f} fps  {n_frames} frames)  "
+        f"capture={capture_backend}"
+    )
 
     all_m: list[dict] = []
     prev_mask = None
@@ -510,9 +494,16 @@ def run_video_benchmark(args, canonical_model: str, seg) -> dict:
 
     for vp in vids:
         if args.save_outputs:
-            vm = sr.run_video(seg, vp, out_dir, canonical_model)
+            vm = sr.run_video(
+                seg,
+                vp,
+                out_dir,
+                canonical_model,
+                video_writer=getattr(args, "video_writer", "auto"),
+                video_capture=getattr(args, "video_capture", "auto"),
+            )
         else:
-            vm = _run_video_metrics_only(seg, vp)
+            vm = _run_video_metrics_only(seg, vp, video_capture=getattr(args, "video_capture", "auto"))
 
         per_video[vp.name] = vm
         all_frames.extend(vm)
@@ -587,18 +578,15 @@ def run_image_benchmark(args, canonical_model: str) -> dict:
 
     for img_path in images:
         if args.save_outputs:
-            m = sr.run_image(seg, img_path, out_dir, canonical_model, label_dir)
-            if not m:
+            res = sr.run_image(seg, img_path, out_dir, canonical_model, label_dir, return_mask=True)
+            if not res:
                 continue
+            m, mask = res
             # For aggregate FP/FN rates we need counts; compute once per image.
             lp = sr.find_label(img_path, label_dir)
             if lp and lp.exists():
                 gt_mask, void_mask = sr.load_gt_mask(lp)
                 if gt_mask is not None:
-                    img = sr.cv2.imread(str(img_path))
-                    result, _ = seg.infer(str(img_path))
-                    h, w = img.shape[:2]
-                    mask, _ = sr.extract_masks(result, h, w)
                     TP, TN, FP, FN = _compute_counts(mask, gt_mask, void_mask)
                     counts["TP"] += TP
                     counts["TN"] += TN
@@ -845,15 +833,26 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Path to a local YOLOE-26 .pt weights file (disables any auto-download behavior).",
     )
+    run.add_argument(
+        "--yolo-backend",
+        default="tensorrt",
+        choices=["pytorch", "tensorrt"],
+        help="YOLO inference backend (default: tensorrt): pytorch or tensorrt.",
+    )
+    run.add_argument(
+        "--yolo-engine",
+        default=None,
+        help="Path to TensorRT .engine file (used when --yolo-backend tensorrt).",
+    )
     run.add_argument("--fastsam-weights", default="FastSAM-x.pt", help="Path to local FastSAM weights .pt.")
     run.add_argument("--mobilesam-weights", default="mobile_sam.pt", help="Path to local MobileSAM weights .pt.")
     run.add_argument("--sam3-weights", default="sam3.pt", help="Path to sam3.pt.")
     run.add_argument("--sam21-weights", default="sam2.1_l.pt", help="Path to sam2.1_l.pt.")
     run.add_argument(
         "--hardware",
-        default="auto",
+        default="jetson",
         choices=["auto", "jetson", "desktop"],
-        help="Hardware preset. 'jetson' reduces disk I/O by default.",
+        help="Hardware preset (default: jetson). Use desktop/auto to override.",
     )
     run.add_argument(
         "--save-outputs",
@@ -883,20 +882,43 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Path to a local YOLOE-26 .pt weights file (disables any auto-download behavior).",
     )
+    allcmd.add_argument(
+        "--yolo-backend",
+        default="tensorrt",
+        choices=["pytorch", "tensorrt"],
+        help="YOLO inference backend (default: tensorrt): pytorch or tensorrt.",
+    )
+    allcmd.add_argument(
+        "--yolo-engine",
+        default=None,
+        help="Path to TensorRT .engine file (used when --yolo-backend tensorrt).",
+    )
     allcmd.add_argument("--fastsam-weights", default="FastSAM-x.pt", help="Path to local FastSAM weights .pt.")
     allcmd.add_argument("--mobilesam-weights", default="mobile_sam.pt", help="Path to local MobileSAM weights .pt.")
     allcmd.add_argument("--sam3-weights", default="sam3.pt", help="Path to sam3.pt.")
     allcmd.add_argument("--sam21-weights", default="sam2.1_l.pt", help="Path to sam2.1_l.pt.")
     allcmd.add_argument(
         "--hardware",
-        default="auto",
+        default="jetson",
         choices=["auto", "jetson", "desktop"],
-        help="Hardware preset. 'jetson' reduces disk I/O by default.",
+        help="Hardware preset (default: jetson). Use desktop/auto to override.",
     )
     allcmd.add_argument(
         "--save-outputs",
         action="store_true",
         help="Save annotated images and videos (slower; more disk I/O).",
+    )
+    allcmd.add_argument(
+        "--video-writer",
+        default="auto",
+        choices=["auto", "opencv", "gstreamer"],
+        help="Video writer backend for saved videos: auto (Jetson->GStreamer), opencv, or gstreamer.",
+    )
+    allcmd.add_argument(
+        "--video-capture",
+        default="auto",
+        choices=["auto", "opencv", "gstreamer"],
+        help="Video capture backend for reading videos: auto (Jetson->GStreamer), opencv, or gstreamer.",
     )
     allcmd.add_argument(
         "--warmup",
