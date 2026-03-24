@@ -9,3 +9,7 @@ test_data
 __pycache__
 datasets
 .DS_Store
+.venv/
+*.engine
+*.onnx
+*.whl

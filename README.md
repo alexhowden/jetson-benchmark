@@ -19,7 +19,7 @@
 ### 1a. Create and activate a venv
 
 ```bash
-python3 -m venv .venv
+/usr/bin/python3.10 -m venv --system-site-packages .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 ```
@@ -34,10 +34,11 @@ For JetPack 6.x (CUDA 12.2), torch 2.3.0, use this flow:
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y python3-pip libopenblas-dev
+sudo apt-get install -y python3-pip libopenblas-dev python3-libnvinfer
 python -m pip install --upgrade pip setuptools wheel
 pip3 install 'Cython<3' numpy==1.26.4
 
+ORIG_DIR="$(pwd)"
 mkdir -p ~/Downloads/jetson_torch230
 cd ~/Downloads/jetson_torch230
 
@@ -49,6 +50,7 @@ wget -O torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl \
 
 python -m pip install --no-cache-dir ./torch-2.3.0-cp310-cp310-linux_aarch64.whl
 python -m pip install --no-cache-dir ./torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl
+cd "$ORIG_DIR"
 ```
 
 ### 1c. Install remaining dependencies without replacing torch
@@ -70,7 +72,10 @@ python -m pip install \
   huggingface_hub==1.4.1 \
   ftfy \
   regex \
-  polars
+  polars \
+  onnx \
+  onnxslim>=0.1.71 \
+
 
 python -m pip install --no-deps ultralytics==8.4.15
 python -m pip install --no-deps ultralytics-thop==2.0.18
@@ -86,6 +91,8 @@ if torch.cuda.is_available():
 print("cv2:", cv2.__version__)
 print("ultralytics:", ultralytics.__version__)
 PY
+
+export ULTRALYTICS_SKIP_INSTALL=1
 ```
 
 If torch gets replaced accidentally, reinstall torch from the NVIDIA Jetson thread above.
