@@ -1,0 +1,564 @@
+/home/nvidia/Documents/jetson-benchmark/.venv/lib/python3.10/site-packages/torch/nn/modules/conv.py:456: UserWarning: Plan failed with a cudnnException: CUDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR: cudnnFinalize Descriptor Failed cudnn_status: CUDNN_STATUS_NOT_SUPPORTED (Triggered internally at /opt/pytorch/aten/src/ATen/native/cudnn/Conv_v8.cpp:919.)
+  return F.conv2d(input, weight, bias, self.stride,
+[YOLO26] Loading yoloe-26x-seg.pt (auto-download if not cached) ...
+[YOLO26] Text classes : ['traversable road', 'dirt road', 'off-road trail', 'drivable terrain', 'gravel path']
+[YOLO26] Inference image size: 640
+
+[Benchmark: Images]
+[YOLO26] Loading yoloe-26x-seg.pt (auto-download if not cached) ...
+[YOLO26] Text classes : ['traversable road', 'dirt road', 'off-road trail', 'drivable terrain', 'gravel path']
+[YOLO26] Inference image size: 640
+  1619778711758.png               cov= 35.5%  t=275ms  IoU=0.914  F1=0.955
+  1619778712161.png               cov= 36.2%  t=284ms  IoU=0.924  F1=0.961
+  1619778716175.png               cov= 34.1%  t=295ms  IoU=0.916  F1=0.956
+  1619778726176.png               cov= 32.7%  t=266ms  IoU=0.922  F1=0.960
+  1619778745473.png               cov= 36.3%  t=292ms  IoU=0.915  F1=0.955
+  1619778752899.png               cov= 32.4%  t=267ms  IoU=0.911  F1=0.954
+  1619778754992.png               cov= 33.4%  t=267ms  IoU=0.922  F1=0.959
+  1619783768217.png               cov=  0.0%  t=289ms  IoU=0.000  F1=0.000
+  1619783768936.png               cov=  0.0%  t=263ms  IoU=0.000  F1=0.000
+  1619783769818.png               cov=  0.0%  t=271ms  IoU=0.000  F1=0.000
+  1619783773322.png               cov=  0.0%  t=279ms  IoU=0.000  F1=0.000
+  1619783797742.png               cov=  0.0%  t=270ms  IoU=0.000  F1=0.000
+  1619783808436.png               cov=  0.0%  t=264ms  IoU=0.000  F1=0.000
+  1619783810925.png               cov=  0.0%  t=288ms  IoU=0.000  F1=0.000
+  1619783811939.png               cov=  0.0%  t=264ms  IoU=0.000  F1=0.000
+  1620326333954.png               cov= 36.1%  t=265ms  IoU=0.800  F1=0.889
+  1620326335560.png               cov= 37.4%  t=282ms  IoU=0.759  F1=0.863
+  1620326337155.png               cov= 35.8%  t=264ms  IoU=0.743  F1=0.853
+  1620326342035.png               cov= 38.2%  t=273ms  IoU=0.819  F1=0.901
+  1620326378267.png               cov= 37.9%  t=280ms  IoU=0.825  F1=0.904
+  1620326379757.png               cov= 39.1%  t=273ms  IoU=0.842  F1=0.914
+  1620326381367.png               cov= 37.1%  t=264ms  IoU=0.819  F1=0.901
+  1620326391331.png               cov= 42.8%  t=288ms  IoU=0.768  F1=0.869
+  1620326396145.png               cov= 40.5%  t=264ms  IoU=0.658  F1=0.794
+  1620330256033.png               cov=  0.0%  t=268ms  IoU=0.000  F1=0.000
+  1620330266457.png               cov= 31.4%  t=280ms  IoU=0.908  F1=0.952
+  1620330270757.png               cov= 29.9%  t=263ms  IoU=0.889  F1=0.941
+  1620330280555.png               cov= 23.8%  t=263ms  IoU=0.655  F1=0.792
+  1620330283542.png               cov=  0.0%  t=279ms  IoU=0.000  F1=0.000
+  1620330291945.png               cov= 32.4%  t=272ms  IoU=0.915  F1=0.956
+  1620330293737.png               cov= 31.6%  t=264ms  IoU=0.918  F1=0.957
+  1620330301450.png               cov= 32.5%  t=286ms  IoU=0.916  F1=0.956
+  1620330305862.png               cov= 32.3%  t=264ms  IoU=0.915  F1=0.956
+  1620330309054.png               cov= 32.4%  t=272ms  IoU=0.913  F1=0.955
+  1620330324865.png               cov= 30.1%  t=282ms  IoU=0.923  F1=0.960
+  1620330326257.png               cov= 30.8%  t=272ms  IoU=0.924  F1=0.960
+  1620330550130.png               cov= 46.1%  t=263ms  IoU=0.858  F1=0.924
+  1620330556341.png               cov= 42.1%  t=282ms  IoU=0.786  F1=0.880
+  1620330562734.png               cov= 37.9%  t=263ms  IoU=0.717  F1=0.835
+  1620330563634.png               cov= 46.9%  t=263ms  IoU=0.876  F1=0.934
+  1620330568313.png               cov= 45.7%  t=272ms  IoU=0.843  F1=0.915
+  1620330574417.png               cov= 46.0%  t=263ms  IoU=0.757  F1=0.862
+  1620330581706.png               cov= 47.9%  t=272ms  IoU=0.781  F1=0.877
+  1620330587449.png               cov= 46.3%  t=264ms  IoU=0.838  F1=0.912
+  1620330592523.png               cov= 43.0%  t=271ms  IoU=0.773  F1=0.872
+  1620330595128.png               cov= 42.0%  t=263ms  IoU=0.756  F1=0.861
+  1620330603723.png               cov= 38.0%  t=273ms  IoU=0.633  F1=0.775
+  1620330604041.png               cov= 38.7%  t=264ms  IoU=0.622  F1=0.767
+  1620330617210.png               cov= 34.1%  t=272ms  IoU=0.799  F1=0.888
+  1620330626136.png               cov= 46.3%  t=264ms  IoU=0.700  F1=0.824
+  1620330628635.png               cov= 46.5%  t=277ms  IoU=0.760  F1=0.864
+  1620331023660.png               cov= 47.7%  t=264ms  IoU=0.726  F1=0.841
+  1620331041339.png               cov= 42.0%  t=263ms  IoU=0.862  F1=0.926
+  1620331047255.png               cov= 47.3%  t=288ms  IoU=0.767  F1=0.868
+  1620331050234.png               cov= 46.1%  t=263ms  IoU=0.768  F1=0.869
+  1620331054844.png               cov= 45.0%  t=271ms  IoU=0.818  F1=0.900
+  1620373585181.png               cov= 41.6%  t=283ms  IoU=0.504  F1=0.670
+  1620373590602.png               cov= 47.7%  t=274ms  IoU=0.492  F1=0.660
+  1620373594408.png               cov=  0.0%  t=264ms  IoU=0.000  F1=0.000
+  1620373615204.png               cov=  0.0%  t=289ms  IoU=0.000  F1=0.000
+  1620373627797.png               cov= 46.8%  t=265ms  IoU=0.560  F1=0.718
+  1620373628284.png               cov= 45.7%  t=265ms  IoU=0.568  F1=0.725
+  1620463037999.png               cov= 29.5%  t=293ms  IoU=0.806  F1=0.893
+  1620463042762.png               cov= 43.1%  t=267ms  IoU=0.666  F1=0.800
+  1620463061471.png               cov= 28.0%  t=274ms  IoU=0.821  F1=0.902
+  1620463067372.png               cov= 28.7%  t=284ms  IoU=0.785  F1=0.879
+  1620463073186.png               cov= 31.3%  t=275ms  IoU=0.700  F1=0.824
+  1620497359911.png               cov= 37.3%  t=264ms  IoU=0.774  F1=0.873
+  1620497365221.png               cov= 38.9%  t=286ms  IoU=0.761  F1=0.864
+  1620497370411.png               cov= 41.5%  t=264ms  IoU=0.784  F1=0.879
+  1620497372429.png               cov= 42.6%  t=264ms  IoU=0.745  F1=0.854
+  1620497385222.png               cov= 30.0%  t=290ms  IoU=0.613  F1=0.760
+  1620497389541.png               cov= 35.4%  t=264ms  IoU=0.695  F1=0.820
+  1620497392924.png               cov= 30.4%  t=307ms  IoU=0.757  F1=0.862
+  1620497404206.png               cov= 54.9%  t=277ms  IoU=0.880  F1=0.936
+  1623170247537.png               cov= 16.7%  t=280ms  IoU=0.909  F1=0.953
+  1623170280401.png               cov= 17.7%  t=272ms  IoU=0.870  F1=0.931
+  1623171106213.png               cov= 26.4%  t=283ms  IoU=0.906  F1=0.951
+  1623171110375.png               cov= 17.5%  t=278ms  IoU=0.880  F1=0.936
+  1623171112228.png               cov= 20.7%  t=271ms  IoU=0.881  F1=0.937
+  1623171129315.png               cov= 14.7%  t=281ms  IoU=0.863  F1=0.927
+  1623171132060.png               cov= 16.4%  t=273ms  IoU=0.866  F1=0.928
+  1623171138963.png               cov= 17.1%  t=281ms  IoU=0.821  F1=0.902
+  1623171140116.png               cov= 14.4%  t=273ms  IoU=0.856  F1=0.922
+  1623171145561.png               cov= 18.2%  t=272ms  IoU=0.901  F1=0.948
+  1623171157778.png               cov= 17.7%  t=279ms  IoU=0.872  F1=0.932
+  1623171165581.png               cov= 16.6%  t=272ms  IoU=0.866  F1=0.928
+  1623171166729.png               cov= 17.9%  t=281ms  IoU=0.864  F1=0.927
+  1623175238114.png               cov= 25.8%  t=292ms  IoU=0.865  F1=0.927
+  1623175238272.png               cov= 26.3%  t=279ms  IoU=0.868  F1=0.929
+  1623175249340.png               cov= 24.3%  t=270ms  IoU=0.873  F1=0.932
+  1623175254959.png               cov= 22.8%  t=289ms  IoU=0.885  F1=0.939
+  1623175255299.png               cov= 23.5%  t=278ms  IoU=0.887  F1=0.940
+  1623390585361.png               cov= 32.8%  t=270ms  IoU=0.881  F1=0.937
+  1623390591530.png               cov= 40.8%  t=294ms  IoU=0.821  F1=0.902
+  1623390598385.png               cov= 41.4%  t=270ms  IoU=0.827  F1=0.905
+  1623390655829.png               cov= 42.4%  t=278ms  IoU=0.786  F1=0.880
+  1623390666660.png               cov= 44.6%  t=287ms  IoU=0.745  F1=0.854
+  1623390673122.png               cov= 40.5%  t=270ms  IoU=0.729  F1=0.844
+  1623433536425.png               cov= 16.0%  t=279ms  IoU=0.880  F1=0.936
+  1623433587631.png               cov= 15.8%  t=289ms  IoU=0.884  F1=0.938
+  1623433588580.png               cov= 15.6%  t=280ms  IoU=0.876  F1=0.934
+  1623433600836.png               cov= 15.9%  t=271ms  IoU=0.889  F1=0.941
+  1623433608703.png               cov= 15.6%  t=297ms  IoU=0.880  F1=0.936
+  1623433629399.png               cov= 15.6%  t=271ms  IoU=0.878  F1=0.935
+  1623458346372.png               cov= 16.1%  t=270ms  IoU=0.873  F1=0.932
+  1623458377476.png               cov= 15.4%  t=297ms  IoU=0.885  F1=0.939
+  1623458391579.png               cov= 15.8%  t=270ms  IoU=0.867  F1=0.929
+  1623458399903.png               cov=  0.0%  t=275ms  IoU=0.000  F1=0.000
+  1623463814965.png               cov= 25.8%  t=286ms  IoU=0.793  F1=0.885
+  1623463819272.png               cov= 30.3%  t=278ms  IoU=0.839  F1=0.912
+  1623463834216.png               cov= 26.1%  t=270ms  IoU=0.658  F1=0.794
+  1623464691997.png               cov=  0.0%  t=282ms  IoU=0.000  F1=0.000
+  1623464697355.png               cov=  0.0%  t=265ms  IoU=0.000  F1=0.000
+  1623688519893.png               cov= 15.4%  t=268ms  IoU=0.876  F1=0.934
+  1623688520592.png               cov= 15.5%  t=294ms  IoU=0.871  F1=0.931
+  1623688520795.png               cov= 15.5%  t=268ms  IoU=0.872  F1=0.932
+  1623688520895.png               cov= 15.5%  t=276ms  IoU=0.869  F1=0.930
+  1623688521598.png               cov= 15.4%  t=286ms  IoU=0.879  F1=0.936
+  1623688524896.png               cov= 15.0%  t=277ms  IoU=0.867  F1=0.929
+  1623688536009.png               cov= 15.8%  t=267ms  IoU=0.872  F1=0.932
+  1623688556174.png               cov=  0.0%  t=267ms  IoU=0.000  F1=0.000
+  1623691607765.png               cov= 27.4%  t=280ms  IoU=0.904  F1=0.949
+  1623691631971.png               cov= 22.7%  t=273ms  IoU=0.892  F1=0.943
+  1623697233865.png               cov=  0.0%  t=287ms  IoU=0.000  F1=0.000
+  1623697233984.png               cov=  0.0%  t=266ms  IoU=0.000  F1=0.000
+  1623697242157.png               cov=  0.0%  t=275ms  IoU=0.000  F1=0.000
+  1623697256332.png               cov=  0.0%  t=266ms  IoU=0.000  F1=0.000
+  1623697278330.png               cov=  0.0%  t=275ms  IoU=0.000  F1=0.000
+  1623697281051.png               cov= 18.0%  t=270ms  IoU=0.679  F1=0.809
+  1623697285274.png               cov= 18.1%  t=288ms  IoU=0.686  F1=0.814
+  1623697286880.png               cov= 14.8%  t=280ms  IoU=0.725  F1=0.841
+  1623721497395.png               cov= 21.5%  t=271ms  IoU=0.866  F1=0.928
+  1623721499590.png               cov= 21.4%  t=279ms  IoU=0.876  F1=0.934
+  1623721526194.png               cov= 29.2%  t=270ms  IoU=0.887  F1=0.940
+  1623721534498.png               cov= 33.9%  t=279ms  IoU=0.794  F1=0.885
+  1623721539297.png               cov= 36.2%  t=269ms  IoU=0.808  F1=0.894
+  1623721541801.png               cov= 35.5%  t=269ms  IoU=0.817  F1=0.899
+  1623721562196.png               cov= 40.0%  t=269ms  IoU=0.614  F1=0.761
+  1623721570650.png               cov= 37.2%  t=269ms  IoU=0.555  F1=0.714
+  1623721573161.png               cov= 41.7%  t=278ms  IoU=0.567  F1=0.724
+  1623721584403.png               cov= 36.1%  t=270ms  IoU=0.550  F1=0.709
+  1623721596573.png               cov= 24.2%  t=278ms  IoU=0.785  F1=0.880
+  1623721598894.png               cov= 24.2%  t=270ms  IoU=0.777  F1=0.875
+  1623721599201.png               cov= 24.6%  t=279ms  IoU=0.753  F1=0.859
+  1623722176899.png               cov= 13.6%  t=271ms  IoU=0.739  F1=0.850
+  1623722177183.png               cov= 13.5%  t=271ms  IoU=0.745  F1=0.854
+  1623722185322.png               cov= 12.2%  t=276ms  IoU=0.731  F1=0.845
+  1623722189300.png               cov= 15.7%  t=272ms  IoU=0.760  F1=0.863
+  1623722194078.png               cov= 13.8%  t=281ms  IoU=0.725  F1=0.841
+  1623722234334.png               cov= 36.5%  t=272ms  IoU=0.690  F1=0.817
+  1623722236172.png               cov=  0.0%  t=277ms  IoU=0.000  F1=0.000
+  1623722246663.png               cov= 37.3%  t=271ms  IoU=0.837  F1=0.911
+  1623722253622.png               cov=  0.0%  t=273ms  IoU=0.000  F1=0.000
+  1623724406329.png               cov= 27.4%  t=268ms  IoU=0.812  F1=0.896
+  1623724406507.png               cov= 27.1%  t=268ms  IoU=0.814  F1=0.897
+  1623724417087.png               cov= 24.5%  t=281ms  IoU=0.824  F1=0.904
+  1623724435793.png               cov= 27.9%  t=268ms  IoU=0.744  F1=0.853
+  1623724438273.png               cov= 25.9%  t=276ms  IoU=0.784  F1=0.879
+  1623724439921.png               cov= 27.7%  t=268ms  IoU=0.747  F1=0.855
+  1623724466993.png               cov= 29.2%  t=277ms  IoU=0.820  F1=0.901
+  1623728554661.png               cov= 31.1%  t=270ms  IoU=0.872  F1=0.931
+  1623728555463.png               cov= 30.6%  t=279ms  IoU=0.873  F1=0.932
+  1623728560660.png               cov= 31.1%  t=270ms  IoU=0.840  F1=0.913
+  1623728570567.png               cov= 30.0%  t=269ms  IoU=0.839  F1=0.912
+  1623728570661.png               cov= 32.1%  t=278ms  IoU=0.771  F1=0.871
+  1623728574460.png               cov= 30.2%  t=269ms  IoU=0.798  F1=0.888
+  1623728576466.png               cov= 30.2%  t=278ms  IoU=0.804  F1=0.891
+  1623728581463.png               cov= 32.1%  t=269ms  IoU=0.757  F1=0.862
+  1623728611013.png               cov= 31.0%  t=277ms  IoU=0.846  F1=0.917
+  1623728615673.png               cov= 30.5%  t=268ms  IoU=0.860  F1=0.925
+  1623731159533.png               cov= 19.3%  t=275ms  IoU=0.881  F1=0.937
+  1623731172619.png               cov= 19.4%  t=267ms  IoU=0.886  F1=0.940
+  1623731175301.png               cov= 18.9%  t=266ms  IoU=0.884  F1=0.939
+  1623731176862.png               cov= 19.2%  t=266ms  IoU=0.887  F1=0.940
+  1623731178679.png               cov= 18.8%  t=269ms  IoU=0.888  F1=0.941
+  1623731216574.png               cov= 20.5%  t=275ms  IoU=0.607  F1=0.755
+  1623731218333.png               cov= 20.3%  t=267ms  IoU=0.678  F1=0.808
+  1623731226078.png               cov= 18.9%  t=278ms  IoU=0.863  F1=0.926
+  1623731229977.png               cov= 20.1%  t=266ms  IoU=0.823  F1=0.903
+  1623731231505.png               cov= 17.1%  t=274ms  IoU=0.857  F1=0.923
+  1623731236853.png               cov= 10.9%  t=284ms  IoU=0.795  F1=0.886
+  1623733082129.png               cov= 33.9%  t=279ms  IoU=0.813  F1=0.897
+  1623733099765.png               cov= 12.2%  t=271ms  IoU=0.871  F1=0.931
+  1623733103603.png               cov= 15.3%  t=274ms  IoU=0.855  F1=0.922
+  1623733109343.png               cov= 16.4%  t=280ms  IoU=0.851  F1=0.919
+  1623734175530.png               cov= 12.9%  t=270ms  IoU=0.817  F1=0.899
+  1623734198846.png               cov= 13.9%  t=293ms  IoU=0.841  F1=0.914
+  1624041979981.png               cov= 30.3%  t=269ms  IoU=0.908  F1=0.952
+  1624041982509.png               cov= 30.8%  t=278ms  IoU=0.902  F1=0.948
+  1624041986089.png               cov= 32.2%  t=269ms  IoU=0.899  F1=0.947
+  1624041996472.png               cov= 30.8%  t=269ms  IoU=0.893  F1=0.943
+  1624042018160.png               cov= 32.4%  t=270ms  IoU=0.892  F1=0.943
+  1624045558662.png               cov= 36.8%  t=279ms  IoU=0.826  F1=0.905
+  1624045562562.png               cov= 36.8%  t=278ms  IoU=0.830  F1=0.907
+  1624045574061.png               cov= 36.7%  t=269ms  IoU=0.851  F1=0.920
+  1624045575465.png               cov= 36.8%  t=277ms  IoU=0.839  F1=0.912
+  1624045577361.png               cov= 38.7%  t=269ms  IoU=0.788  F1=0.881
+  1624045586468.png               cov=  0.0%  t=275ms  IoU=0.000  F1=0.000
+  1624045587762.png               cov= 37.7%  t=281ms  IoU=0.806  F1=0.893
+
+==================================================================
+  Results: YOLO26    |  200 image(s) [benchmark]
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                274.377   262.670   306.800
+  fps                                3.651     3.300     3.800
+  -- Model output --
+  road_coverage_pct                 25.931     0.000    54.880
+  mean_confidence                    0.593     0.000     0.978
+  num_detections                     0.945     0.000     2.000
+  -- Ground truth --
+  iou                                0.713     0.000     0.924
+  f1                                 0.785     0.000     0.961
+  precision                          0.794     0.000     1.000
+  recall                             0.786     0.000     0.957
+  pixel_accuracy                     0.898     0.432     0.983
+==================================================================
+
+
+Benchmark JSON report → /home/nvidia/Documents/jetson-benchmark/output/config-tests/yolo26-x-pytorch/yolo26/benchmark_metrics_yolo26.json
+
+[Benchmark: Videos]
+
+  [VIDEO] Part 1.mp4  (1920×1080  30.0 fps  478 frames)  capture=opencv
+    frame   30/478  cov=0.0%  conf=0.000  t=247ms
+    frame   60/478  cov=0.0%  conf=0.000  t=247ms
+    frame   90/478  cov=0.0%  conf=0.000  t=238ms
+    frame  120/478  cov=0.0%  conf=0.000  t=238ms
+    frame  150/478  cov=0.0%  conf=0.000  t=249ms
+    frame  180/478  cov=0.0%  conf=0.000  t=255ms
+    frame  210/478  cov=0.0%  conf=0.000  t=238ms
+    frame  240/478  cov=0.0%  conf=0.000  t=238ms
+    frame  270/478  cov=0.0%  conf=0.000  t=238ms
+    frame  300/478  cov=0.0%  conf=0.000  t=264ms
+    frame  330/478  cov=0.0%  conf=0.000  t=255ms
+    frame  360/478  cov=32.7%  conf=0.316  t=249ms
+    frame  390/478  cov=0.0%  conf=0.000  t=246ms
+    frame  420/478  cov=0.0%  conf=0.000  t=253ms
+    frame  450/478  cov=0.0%  conf=0.000  t=248ms
+
+==================================================================
+  Results: YOLO26    |  Part 1.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                248.337   237.230   804.370
+  fps                                4.049     1.200     4.200
+  -- Model output --
+  road_coverage_pct                  2.663     0.000    44.860
+  mean_confidence                    0.021     0.000     0.354
+  num_detections                     0.073     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 10.mp4  (1920×1080  30.0 fps  471 frames)  capture=opencv
+    frame   30/471  cov=35.0%  conf=0.316  t=248ms
+    frame   60/471  cov=0.0%  conf=0.000  t=245ms
+    frame   90/471  cov=0.0%  conf=0.000  t=289ms
+    frame  120/471  cov=0.0%  conf=0.000  t=332ms
+    frame  150/471  cov=0.0%  conf=0.000  t=246ms
+    frame  180/471  cov=0.0%  conf=0.000  t=238ms
+    frame  210/471  cov=0.0%  conf=0.000  t=238ms
+    frame  240/471  cov=0.0%  conf=0.000  t=246ms
+    frame  270/471  cov=0.0%  conf=0.000  t=238ms
+    frame  300/471  cov=0.0%  conf=0.000  t=244ms
+    frame  330/471  cov=0.0%  conf=0.000  t=238ms
+    frame  360/471  cov=0.0%  conf=0.000  t=286ms
+    frame  390/471  cov=39.3%  conf=0.289  t=256ms
+    frame  420/471  cov=37.4%  conf=0.256  t=240ms
+    frame  450/471  cov=0.0%  conf=0.000  t=238ms
+
+==================================================================
+  Results: YOLO26    |  Part 10.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                254.101   237.190   496.880
+  fps                                3.980     2.000     4.200
+  -- Model output --
+  road_coverage_pct                  3.939     0.000    46.770
+  mean_confidence                    0.030     0.000     0.388
+  num_detections                     0.098     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 11.mp4  (1920×1080  30.0 fps  465 frames)  capture=opencv
+    frame   30/465  cov=0.0%  conf=0.000  t=237ms
+    frame   60/465  cov=41.9%  conf=0.292  t=240ms
+    frame   90/465  cov=40.7%  conf=0.341  t=255ms
+    frame  120/465  cov=0.0%  conf=0.000  t=238ms
+    frame  150/465  cov=0.0%  conf=0.000  t=238ms
+    frame  180/465  cov=0.0%  conf=0.000  t=238ms
+    frame  210/465  cov=41.9%  conf=0.294  t=249ms
+    frame  240/465  cov=0.0%  conf=0.000  t=260ms
+    frame  270/465  cov=46.1%  conf=0.250  t=240ms
+    frame  300/465  cov=44.4%  conf=0.264  t=240ms
+    frame  330/465  cov=45.3%  conf=0.292  t=240ms
+    frame  360/465  cov=0.0%  conf=0.000  t=239ms
+    frame  390/465  cov=45.0%  conf=0.292  t=256ms
+    frame  420/465  cov=0.0%  conf=0.000  t=238ms
+    frame  450/465  cov=0.0%  conf=0.000  t=238ms
+
+==================================================================
+  Results: YOLO26    |  Part 11.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                250.463   237.030   500.830
+  fps                                4.033     2.000     4.200
+  -- Model output --
+  road_coverage_pct                 10.208     0.000    48.240
+  mean_confidence                    0.068     0.000     0.377
+  num_detections                     0.232     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 12.mp4  (1920×1080  30.0 fps  455 frames)  capture=opencv
+    frame   30/455  cov=0.0%  conf=0.000  t=237ms
+    frame   60/455  cov=0.0%  conf=0.000  t=238ms
+    frame   90/455  cov=0.0%  conf=0.000  t=238ms
+    frame  120/455  cov=0.0%  conf=0.000  t=237ms
+    frame  150/455  cov=0.0%  conf=0.000  t=253ms
+    frame  180/455  cov=0.0%  conf=0.000  t=237ms
+    frame  210/455  cov=0.0%  conf=0.000  t=237ms
+    frame  240/455  cov=0.0%  conf=0.000  t=252ms
+    frame  270/455  cov=0.0%  conf=0.000  t=237ms
+    frame  300/455  cov=0.0%  conf=0.000  t=238ms
+    frame  330/455  cov=0.0%  conf=0.000  t=237ms
+    frame  360/455  cov=0.0%  conf=0.000  t=238ms
+    frame  390/455  cov=0.0%  conf=0.000  t=237ms
+    frame  420/455  cov=39.1%  conf=0.348  t=240ms
+    frame  450/455  cov=0.0%  conf=0.000  t=254ms
+
+==================================================================
+  Results: YOLO26    |  Part 12.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                241.195   236.850   256.620
+  fps                                4.143     3.900     4.200
+  -- Model output --
+  road_coverage_pct                  2.332     0.000    44.120
+  mean_confidence                    0.017     0.000     0.403
+  num_detections                     0.057     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 13.mp4  (1920×1080  30.0 fps  456 frames)  capture=opencv
+    frame   30/456  cov=40.6%  conf=0.256  t=240ms
+    frame   60/456  cov=39.4%  conf=0.269  t=256ms
+    frame   90/456  cov=37.3%  conf=0.263  t=256ms
+    frame  120/456  cov=0.0%  conf=0.000  t=237ms
+    frame  150/456  cov=0.0%  conf=0.000  t=237ms
+    frame  180/456  cov=0.0%  conf=0.000  t=249ms
+    frame  210/456  cov=0.0%  conf=0.000  t=239ms
+    frame  240/456  cov=0.0%  conf=0.000  t=238ms
+    frame  270/456  cov=0.0%  conf=0.000  t=237ms
+    frame  300/456  cov=35.5%  conf=0.346  t=255ms
+    frame  330/456  cov=0.0%  conf=0.000  t=238ms
+    frame  360/456  cov=0.0%  conf=0.000  t=237ms
+    frame  390/456  cov=0.0%  conf=0.000  t=253ms
+    frame  420/456  cov=0.0%  conf=0.000  t=237ms
+    frame  450/456  cov=0.0%  conf=0.000  t=238ms
+
+==================================================================
+  Results: YOLO26    |  Part 13.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                241.614   236.970   259.640
+  fps                                4.139     3.900     4.200
+  -- Model output --
+  road_coverage_pct                  6.171     0.000    43.370
+  mean_confidence                    0.048     0.000     0.400
+  num_detections                     0.167     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 14.mp4  (1920×1080  30.0 fps  467 frames)  capture=opencv
+    frame   30/467  cov=0.0%  conf=0.000  t=252ms
+    frame   60/467  cov=0.0%  conf=0.000  t=238ms
+    frame   90/467  cov=36.7%  conf=0.271  t=240ms
+    frame  120/467  cov=0.0%  conf=0.000  t=238ms
+    frame  150/467  cov=0.0%  conf=0.000  t=253ms
+    frame  180/467  cov=0.0%  conf=0.000  t=237ms
+    frame  210/467  cov=0.0%  conf=0.000  t=237ms
+    frame  240/467  cov=0.0%  conf=0.000  t=253ms
+    frame  270/467  cov=0.0%  conf=0.000  t=238ms
+    frame  300/467  cov=0.0%  conf=0.000  t=237ms
+    frame  330/467  cov=0.0%  conf=0.000  t=237ms
+    frame  360/467  cov=0.0%  conf=0.000  t=250ms
+    frame  390/467  cov=0.0%  conf=0.000  t=237ms
+    frame  420/467  cov=0.0%  conf=0.000  t=237ms
+    frame  450/467  cov=0.0%  conf=0.000  t=253ms
+
+==================================================================
+  Results: YOLO26    |  Part 14.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                241.376   236.970   279.980
+  fps                                4.139     3.600     4.200
+  -- Model output --
+  road_coverage_pct                  1.371     0.000    40.200
+  mean_confidence                    0.010     0.000     0.379
+  num_detections                     0.036     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 15.mp4  (1920×1080  30.0 fps  466 frames)  capture=opencv
+    frame   30/466  cov=0.0%  conf=0.000  t=237ms
+    frame   60/466  cov=31.3%  conf=0.272  t=256ms
+    frame   90/466  cov=0.0%  conf=0.000  t=237ms
+    frame  120/466  cov=0.0%  conf=0.000  t=238ms
+    frame  150/466  cov=0.0%  conf=0.000  t=248ms
+    frame  180/466  cov=0.0%  conf=0.000  t=238ms
+    frame  210/466  cov=0.0%  conf=0.000  t=237ms
+    frame  240/466  cov=0.0%  conf=0.000  t=237ms
+    frame  270/466  cov=0.0%  conf=0.000  t=253ms
+    frame  300/466  cov=0.0%  conf=0.000  t=237ms
+    frame  330/466  cov=0.0%  conf=0.000  t=237ms
+    frame  360/466  cov=0.0%  conf=0.000  t=253ms
+    frame  390/466  cov=42.1%  conf=0.292  t=254ms
+    frame  420/466  cov=0.0%  conf=0.000  t=237ms
+    frame  450/466  cov=0.0%  conf=0.000  t=237ms
+
+==================================================================
+  Results: YOLO26    |  Part 15.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                241.394   236.950   256.320
+  fps                                4.140     3.900     4.200
+  -- Model output --
+  road_coverage_pct                  4.721     0.000    42.230
+  mean_confidence                    0.039     0.000     0.487
+  num_detections                     0.120     0.000     2.000
+==================================================================
+
+
+  [VIDEO] Part 16.mp4  (1920×1080  30.0 fps  457 frames)  capture=opencv
+    frame   30/457  cov=0.0%  conf=0.000  t=237ms
+    frame   60/457  cov=0.0%  conf=0.000  t=237ms
+    frame   90/457  cov=0.0%  conf=0.000  t=253ms
+    frame  120/457  cov=0.0%  conf=0.000  t=237ms
+    frame  150/457  cov=0.0%  conf=0.000  t=237ms
+    frame  180/457  cov=0.0%  conf=0.000  t=253ms
+    frame  210/457  cov=0.0%  conf=0.000  t=237ms
+    frame  240/457  cov=0.0%  conf=0.000  t=237ms
+    frame  270/457  cov=0.0%  conf=0.000  t=237ms
+    frame  300/457  cov=0.0%  conf=0.000  t=238ms
+    frame  330/457  cov=0.0%  conf=0.000  t=237ms
+    frame  360/457  cov=0.0%  conf=0.000  t=284ms
+    frame  390/457  cov=36.2%  conf=0.269  t=257ms
+    frame  420/457  cov=40.5%  conf=0.265  t=253ms
+    frame  450/457  cov=0.0%  conf=0.000  t=339ms
+
+==================================================================
+  Results: YOLO26    |  Part 16.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                256.048   236.960   435.350
+  fps                                3.961     2.300     4.200
+  -- Model output --
+  road_coverage_pct                  5.615     0.000    42.160
+  mean_confidence                    0.042     0.000     0.422
+  num_detections                     0.140     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 17.mp4  (1920×1080  30.0 fps  464 frames)  capture=opencv
+    frame   30/464  cov=0.0%  conf=0.000  t=254ms
+    frame   60/464  cov=0.0%  conf=0.000  t=237ms
+    frame   90/464  cov=0.0%  conf=0.000  t=237ms
+    frame  120/464  cov=0.0%  conf=0.000  t=237ms
+    frame  150/464  cov=0.0%  conf=0.000  t=254ms
+    frame  180/464  cov=0.0%  conf=0.000  t=237ms
+    frame  210/464  cov=0.0%  conf=0.000  t=237ms
+    frame  240/464  cov=0.0%  conf=0.000  t=237ms
+    frame  270/464  cov=0.0%  conf=0.000  t=242ms
+    frame  300/464  cov=0.0%  conf=0.000  t=237ms
+    frame  330/464  cov=0.0%  conf=0.000  t=237ms
+    frame  360/464  cov=0.0%  conf=0.000  t=254ms
+    frame  390/464  cov=0.0%  conf=0.000  t=237ms
+    frame  420/464  cov=0.0%  conf=0.000  t=237ms
+    frame  450/464  cov=0.0%  conf=0.000  t=249ms
+
+==================================================================
+  Results: YOLO26    |  Part 17.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                241.550   236.960   294.400
+  fps                                4.133     3.400     4.200
+  -- Model output --
+  road_coverage_pct                  3.416     0.000    39.420
+  mean_confidence                    0.028     0.000     0.375
+  num_detections                     0.097     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 2.mp4  (1920×1080  30.0 fps  441 frames)  capture=opencv
+    frame   30/441  cov=0.0%  conf=0.000  t=237ms
+    frame   60/441  cov=0.0%  conf=0.000  t=237ms
+    frame   90/441  cov=0.0%  conf=0.000  t=252ms
+    frame  120/441  cov=0.0%  conf=0.000  t=237ms
+    frame  150/441  cov=0.0%  conf=0.000  t=238ms
+    frame  180/441  cov=0.0%  conf=0.000  t=237ms
+    frame  210/441  cov=0.0%  conf=0.000  t=254ms
+    frame  240/441  cov=0.0%  conf=0.000  t=237ms
+    frame  270/441  cov=0.0%  conf=0.000  t=237ms
+    frame  300/441  cov=0.0%  conf=0.000  t=237ms
+    frame  330/441  cov=39.1%  conf=0.253  t=240ms
+    frame  360/441  cov=0.0%  conf=0.000  t=237ms
+    frame  390/441  cov=0.0%  conf=0.000  t=238ms
+    frame  420/441  cov=36.1%  conf=0.348  t=239ms
+
+==================================================================
+  Results: YOLO26    |  Part 2.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                241.597   236.760   257.050
+  fps                                4.138     3.900     4.200
+  -- Model output --
+  road_coverage_pct                  7.708     0.000    42.170
+  mean_confidence                    0.060     0.000     0.441
+  num_detections                     0.204     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 3.mp4  (1920×1080  30.0 fps  460 frames)  capture=opencv
+    frame   30/460  cov=0.0%  conf=0.000  t=237ms
+    frame   60/460  cov=41.0%  conf=0.281  t=240ms
+    frame   90/460  cov=42.9%  conf=0.414  t=240ms
+    frame  120/460  cov=43.5%  conf=0.393  t=240ms
+    frame  150/460  cov=44.0%  conf=0.259  t=239ms
+    frame  180/460  cov=42.3%  conf=0.297  t=240ms
+    frame  210/460  cov=41.1%  conf=0.376  t=256ms
+    frame  240/460  cov=39.6%  conf=0.349  t=244ms
