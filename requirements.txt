@@ -1,14 +1,14 @@
 # pip install --no-deps -r requirements.txt
 
-numpy==2.0.1
+numpy==1.26.4
 opencv-python==4.13.0.92
 ultralytics==8.4.15
 ultralytics-thop==2.0.18
 
 matplotlib==3.10.8
-pandas==3.0.1
+pandas>=2.2.3
 seaborn==0.13.2
-scipy==1.17.1
+scipy==1.15.3
 PyYAML==6.0.2
 psutil==7.2.2
 requests==2.32.5

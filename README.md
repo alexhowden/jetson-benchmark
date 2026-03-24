@@ -33,43 +33,22 @@ Use NVIDIA's Jetson PyTorch thread to get the exact wheel URL and wheel filename
 For JetPack 6.x (CUDA 12.2), torch 2.3.0, use this flow:
 
 ```bash
-# 1) install prerequisites
 sudo apt-get update
-sudo apt-get install -y libopenblas-base libopenmpi-dev libomp-dev libjpeg-dev zlib1g-dev libpython3-dev libavcodec-dev libavformat-dev libswscale-dev
-pip3 install --upgrade pip
-pip3 install 'Cython<3' numpy
+sudo apt-get install -y python3-pip libopenblas-dev
+python -m pip install --upgrade pip setuptools wheel
+pip3 install 'Cython<3' numpy==1.26.4
 
-# 2) install PyTorch 2.3.0 wheel
-wget https://nvidia.box.com/shared/static/47f7220m09sh0af89p67u7vsu8id98be.whl -O torch-2.3.0-cp310-cp310-linux_aarch64.whl
-pip3 install torch-2.3.0-cp310-cp310-linux_aarch64.whl
+mkdir -p ~/Downloads/jetson_torch230
+cd ~/Downloads/jetson_torch230
 
-# 3) install torchvision 0.18.0 from source
-git clone --branch v0.18.0 https://github.com/pytorch/vision torchvision
-cd torchvision
-export BUILD_VERSION=0.18.0
-python3 setup.py install --user
-cd ..
+wget -O torch-2.3.0-cp310-cp310-linux_aarch64.whl \
+  "https://nvidia.box.com/shared/static/mp164asf3sceb570wvjsrezk1p4ftj8t.whl"
 
-# 4) install torchaudio 2.3.0 wheel
-wget https://nvidia.box.com/shared/static/5412702z8vubun372138x1bms9xuncl9.whl -O torchaudio-2.3.0+952ea74-cp310-cp310-linux_aarch64.whl
-pip3 install torchaudio-2.3.0+952ea74-cp310-cp310-linux_aarch64.whl
+wget -O torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl \
+  "https://nvidia.box.com/shared/static/xpr06qe6ql3l6rj22cu3c45tz1wzi36p.whl"
 
-# 5) verify versions and CUDA availability
-python3 -c "import torch, torchvision, torchaudio; print('PyTorch version:', torch.__version__); print('CUDA available:', torch.cuda.is_available()); print('torchvision version:', torchvision.__version__); print('torchaudio version:', torchaudio.__version__)"
-```
-
-Notes:
-
-- These wheel links come from the NVIDIA Jetson PyTorch forum post for torch 2.3.0 on JetPack 6.x.
-- If NVIDIA rotates links or updates wheel names, use the latest links from the forum thread above.
-- If you use the project venv from section 1a, use venv executables instead of system ones:
-
-```bash
-python -m pip install --upgrade pip
-python -m pip install 'Cython<3' numpy
-python -m pip install torch-2.3.0-cp310-cp310-linux_aarch64.whl
-python -m pip install torchaudio-2.3.0+952ea74-cp310-cp310-linux_aarch64.whl
-python -c "import torch, torchvision, torchaudio; print(torch.__version__, torchvision.__version__, torchaudio.__version__, torch.cuda.is_available())"
+python -m pip install --no-cache-dir ./torch-2.3.0-cp310-cp310-linux_aarch64.whl
+python -m pip install --no-cache-dir ./torchvision-0.18.0a0+6043bc2-cp310-cp310-linux_aarch64.whl
 ```
 
 ### 1c. Install remaining dependencies without replacing torch
@@ -77,7 +56,36 @@ python -c "import torch, torchvision, torchaudio; print(torch.__version__, torch
 Some pip installs may try to replace Jetson-specific torch builds. If that happens, install dependencies with no dependency resolution and then add missing packages manually as needed:
 
 ```bash
-pip install --no-deps -r requirements.txt
+python -m pip install \
+  numpy==1.26.4 \
+  opencv-python==4.10.0.84 \
+  matplotlib==3.10.8 \
+  "pandas>=2.2.3,<3" \
+  seaborn==0.13.2 \
+  scipy==1.15.3 \
+  PyYAML==6.0.2 \
+  psutil==7.2.2 \
+  requests==2.32.5 \
+  tqdm==4.67.3 \
+  huggingface_hub==1.4.1 \
+  ftfy \
+  regex \
+  polars
+
+python -m pip install --no-deps ultralytics==8.4.15
+python -m pip install --no-deps ultralytics-thop==2.0.18
+python -m pip install --no-deps "clip @ git+https://github.com/ultralytics/CLIP.git@88ade288431a46233f1556d1e141901b3ef0a36b"
+
+python - <<'PY'
+import torch, torchvision, cv2, ultralytics
+print("torch:", torch.__version__)
+print("torchvision:", torchvision.__version__)
+print("cuda:", torch.cuda.is_available())
+if torch.cuda.is_available():
+    print("gpu:", torch.cuda.get_device_name(0))
+print("cv2:", cv2.__version__)
+print("ultralytics:", ultralytics.__version__)
+PY
 ```
 
 If torch gets replaced accidentally, reinstall torch from the NVIDIA Jetson thread above.
