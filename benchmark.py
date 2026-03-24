@@ -2,7 +2,7 @@
 """
 Benchmark runner for Off-Road Traversable Road Segmentation.
 
-Creates a fixed benchmark set (200 images + 10 videos) and runs a chosen model
+Creates a fixed benchmark set (200 images + videos) and runs a chosen model
 backend (SAM3 / SAM2.1 / YOLOE-26) to produce metrics.
 
 Folders
@@ -236,7 +236,7 @@ def prepare_benchmark_images(
         "prepared_n_images": len(chosen),
         "raw_dir": str(BENCH_IMAGES_RAW),
         "labeled_dir": str(BENCH_IMAGES_LABELED),
-        "note": "Videos are not prepared automatically. Put your 10 videos into benchmark/videos/.",
+        "note": "Videos are not prepared automatically. Put benchmark videos into benchmark/videos/ (17 in current setup).",
     }
 
     (BENCH_ROOT / "benchmark_manifest.json").write_text(json.dumps(meta, indent=2))
@@ -254,6 +254,7 @@ def _build_segmentor(args, canonical_model: str):
             return sr.YOLO26Segmentor(
                 size=args.model_size,
                 conf=args.conf,
+                imgsz=getattr(args, "imgsz", 640),
                 prompts=args.prompts,
                 weights=getattr(args, "yolo_weights", None),
                 backend=getattr(args, "yolo_backend", "pytorch"),
@@ -826,6 +827,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     run.add_argument("--output", default="output", help="Base output directory for annotated results/reports.")
     run.add_argument("--conf", type=float, default=0.25, help="Confidence threshold (YOLO/SAM3).")
+    run.add_argument("--imgsz", type=int, default=640, help="YOLO inference/export image size in pixels (YOLO only).")
     run.add_argument("--prompts", nargs="+", default=None, help="Custom text prompts (YOLO/SAM3 only).")
     run.add_argument("--model-size", default="x", choices=["n", "s", "m", "l", "x"], help="YOLOE-26 size variant.")
     run.add_argument(
@@ -875,6 +877,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     allcmd.add_argument("--output", default="output", help="Base output directory for outputs/reports.")
     allcmd.add_argument("--conf", type=float, default=0.25, help="Confidence threshold (YOLO/SAM3).")
+    allcmd.add_argument("--imgsz", type=int, default=640, help="YOLO inference/export image size in pixels (YOLO only).")
     allcmd.add_argument("--prompts", nargs="+", default=None, help="Custom text prompts (YOLO/SAM3 only).")
     allcmd.add_argument("--model-size", default="x", choices=["n", "s", "m", "l", "x"], help="YOLOE-26 size variant.")
     allcmd.add_argument(

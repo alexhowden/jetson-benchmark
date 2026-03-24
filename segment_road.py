@@ -432,6 +432,7 @@ class YOLO26Segmentor:
         self,
         size: str = "x",
         conf: float = 0.25,
+        imgsz: int = 640,
         prompts: list = None,
         weights: str | None = None,
         backend: str = "pytorch",
@@ -449,8 +450,11 @@ class YOLO26Segmentor:
                 print(f"[YOLO26] Loading TensorRT engine {engine_path} ...")
                 self.model = YOLO(str(engine_path))
             else:
-                print(f"[YOLO26] Exporting TensorRT engine from {name} (first run may take time) ...")
-                exported = base.export(format="engine", half=True)
+                print(
+                    f"[YOLO26] Exporting TensorRT engine from {name} "
+                    f"(imgsz={imgsz}, first run may take time) ..."
+                )
+                exported = base.export(format="engine", half=True, imgsz=imgsz)
                 exported_path = Path(str(exported))
                 print(f"[YOLO26] Loading TensorRT engine {exported_path} ...")
                 self.model = YOLO(str(exported_path))
@@ -459,6 +463,7 @@ class YOLO26Segmentor:
             self.model = YOLO(name)
 
         self.conf = conf
+        self.imgsz = imgsz
         self.prompts = prompts or DEFAULT_PROMPTS
         try:
             self.model.set_classes(self.prompts)
@@ -467,11 +472,12 @@ class YOLO26Segmentor:
         # YOLOE with text prompts uses a CLIP text encoder that stays in float32,
         # so half=True causes a dtype mismatch. Keep full precision.
         print(f"[YOLO26] Text classes : {self.prompts}")
+        print(f"[YOLO26] Inference image size: {self.imgsz}")
 
     def infer(self, source) -> tuple:
         """Run inference on a file path or numpy BGR frame."""
         t0  = time.perf_counter()
-        res = self.model.predict(source, conf=self.conf, verbose=False)
+        res = self.model.predict(source, conf=self.conf, imgsz=self.imgsz, verbose=False)
         t_ms = (time.perf_counter() - t0) * 1000
 
         return res[0], t_ms
@@ -732,6 +738,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="YOLOE-26 model size variant               [default: x, ignored for sam3]",
     )
     p.add_argument(
+        "--imgsz", type=int, default=640,
+        help="YOLO inference/export image size (pixels) [default: 640, YOLO only]",
+    )
+    p.add_argument(
         "--yolo-weights", default=None,
         help="Path to local YOLO weights/engine (optional).",
     )
@@ -798,6 +808,7 @@ def main():
         seg = YOLO26Segmentor(
             size=args.model_size,
             conf=args.conf,
+            imgsz=args.imgsz,
             prompts=args.prompts,
             weights=args.yolo_weights,
             backend=args.yolo_backend,

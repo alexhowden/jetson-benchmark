@@ -13,6 +13,7 @@ VIDEO_WRITER="auto"
 VIDEO_CAPTURE="auto"
 YOLO_MODE="compare"
 YOLO_ENGINE=""
+IMGSZ=640
 WARMUP=3
 SAVE_OUTPUTS=0
 SKIP_PREPARE=0
@@ -37,6 +38,7 @@ Options:
                             YOLO run mode: compare runs pytorch+tensorrt side by side
                             (default: compare)
   --yolo-engine <path>      TensorRT engine path (optional, for yolo26 runs)
+  --imgsz <n>               YOLO inference/export image size in pixels (default: 640)
   --warmup <n>              Warmup images per run (default: 3)
   --save-outputs            Enable annotated image/video saving
   --no-save-outputs         Disable annotated image/video saving (default)
@@ -69,6 +71,8 @@ while [[ $# -gt 0 ]]; do
       YOLO_MODE="$2"; shift 2 ;;
     --yolo-engine)
       YOLO_ENGINE="$2"; shift 2 ;;
+    --imgsz)
+      IMGSZ="$2"; shift 2 ;;
     --warmup)
       WARMUP="$2"; shift 2 ;;
     --save-outputs)
@@ -132,6 +136,7 @@ run_model() {
     --model "$model" \
     --output "$out_root" \
     --hardware "$HARDWARE" \
+    --imgsz "$IMGSZ" \
     --warmup "$WARMUP" \
     --video-writer "$VIDEO_WRITER" \
     --video-capture "$VIDEO_CAPTURE" \
