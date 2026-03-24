@@ -103,12 +103,16 @@ case "$YOLO_MODE" in
 esac
 
 if [[ $SKIP_PREPARE -eq 0 ]]; then
-  echo "[STEP] Preparing benchmark image set..."
-  python benchmark.py prepare \
-    --n-images "$N_IMAGES" \
-    --seed "$SEED" \
-    --source "$SOURCE" \
-    --source-root "$SOURCE_ROOT"
+  if [[ ! -d "$SOURCE_ROOT" && -d "benchmark/images/raw" && -d "benchmark/images/labeled" ]]; then
+    echo "[STEP] Prepare source '$SOURCE_ROOT' not found; using existing benchmark/images and skipping prepare."
+  else
+    echo "[STEP] Preparing benchmark image set..."
+    python benchmark.py prepare \
+      --n-images "$N_IMAGES" \
+      --seed "$SEED" \
+      --source "$SOURCE" \
+      --source-root "$SOURCE_ROOT"
+  fi
 fi
 
 SAVE_FLAG=()
