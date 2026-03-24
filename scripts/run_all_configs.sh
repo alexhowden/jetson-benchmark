@@ -101,11 +101,6 @@ run_benchmark() {
     # Build command (imgsz=640 default, video-capture=opencv)
     local CMD="python benchmark.py all --model yolo26 --model-size ${MODEL_SIZE} --yolo-backend ${BACKEND} --output ${OUTPUT_DIR} --video-capture opencv"
 
-    # Only add --imgsz if not default (640)
-    if [ "${IMGSZ}" != "640" ]; then
-        CMD="${CMD} --imgsz ${IMGSZ}"
-    fi
-
     echo "Command: ${CMD}"
     echo ""
 
