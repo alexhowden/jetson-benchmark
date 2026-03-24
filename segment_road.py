@@ -443,32 +443,41 @@ class YOLO26Segmentor:
         name = weights or f"yoloe-26{size}-seg.pt"
         backend = backend.lower().strip()
 
+        self.conf = conf
+        self.imgsz = imgsz
+        self.prompts = prompts or DEFAULT_PROMPTS
+
         if backend == "tensorrt":
+            print(f"[YOLO26] Loading {name} for TensorRT export ...")
             base = YOLO(name)
+
+            # CRITICAL: Set text classes BEFORE exporting to TensorRT
+            # This bakes the text embeddings into the engine
+            print(f"[YOLO26] Setting text classes: {self.prompts}")
+            base.set_classes(self.prompts)
+
             engine_path = Path(engine) if engine else Path(str(name)).with_suffix(".engine")
             if engine_path.exists():
-                print(f"[YOLO26] Loading TensorRT engine {engine_path} ...")
+                print(f"[YOLO26] Loading existing TensorRT engine {engine_path} ...")
+                print(f"[YOLO26] [WARN] Using existing engine - if text classes changed, delete {engine_path} to re-export")
                 self.model = YOLO(str(engine_path))
             else:
                 print(
                     f"[YOLO26] Exporting TensorRT engine from {name} "
-                    f"(imgsz={imgsz}, first run may take time) ..."
+                    f"(imgsz={imgsz}, half=True, first run may take time) ..."
                 )
                 exported = base.export(format="engine", half=True, imgsz=imgsz)
                 exported_path = Path(str(exported))
+                print(f"[YOLO26] TensorRT engine exported: {exported_path}")
                 print(f"[YOLO26] Loading TensorRT engine {exported_path} ...")
                 self.model = YOLO(str(exported_path))
         else:
             print(f"[YOLO26] Loading {name} (auto-download if not cached) ...")
             self.model = YOLO(name)
-
-        self.conf = conf
-        self.imgsz = imgsz
-        self.prompts = prompts or DEFAULT_PROMPTS
-        try:
-            self.model.set_classes(self.prompts)
-        except Exception as e:
-            print(f"[YOLO26] [WARN] Could not set text classes on current backend: {e}")
+            try:
+                self.model.set_classes(self.prompts)
+            except Exception as e:
+                print(f"[YOLO26] [WARN] Could not set text classes on current backend: {e}")
         # YOLOE with text prompts uses a CLIP text encoder that stays in float32,
         # so half=True causes a dtype mismatch. Keep full precision.
         print(f"[YOLO26] Text classes : {self.prompts}")
