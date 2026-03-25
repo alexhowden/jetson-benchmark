@@ -562,3 +562,219 @@ Benchmark JSON report → /home/nvidia/Documents/jetson-benchmark/output/config-
     frame  180/460  cov=42.3%  conf=0.297  t=240ms
     frame  210/460  cov=41.1%  conf=0.376  t=256ms
     frame  240/460  cov=39.6%  conf=0.349  t=244ms
+    frame  270/460  cov=0.0%  conf=0.000  t=238ms
+    frame  300/460  cov=41.0%  conf=0.350  t=303ms
+    frame  330/460  cov=40.5%  conf=0.295  t=389ms
+    frame  360/460  cov=39.9%  conf=0.310  t=239ms
+    frame  390/460  cov=44.2%  conf=0.303  t=240ms
+    frame  420/460  cov=43.9%  conf=0.268  t=291ms
+    frame  450/460  cov=40.8%  conf=0.265  t=435ms
+
+==================================================================
+  Results: YOLO26    |  Part 3.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                257.144   236.920   468.550
+  fps                                3.951     2.100     4.200
+  -- Model output --
+  road_coverage_pct                 29.497     0.000    44.550
+  mean_confidence                    0.235     0.000     0.526
+  num_detections                     0.707     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 4.mp4  (1920×1080  30.0 fps  467 frames)  capture=opencv
+    frame   30/467  cov=0.0%  conf=0.000  t=237ms
+    frame   60/467  cov=0.0%  conf=0.000  t=237ms
+    frame   90/467  cov=0.0%  conf=0.000  t=252ms
+    frame  120/467  cov=0.0%  conf=0.000  t=237ms
+    frame  150/467  cov=0.0%  conf=0.000  t=238ms
+    frame  180/467  cov=0.0%  conf=0.000  t=252ms
+    frame  210/467  cov=0.0%  conf=0.000  t=253ms
+    frame  240/467  cov=0.0%  conf=0.000  t=237ms
+    frame  270/467  cov=0.0%  conf=0.000  t=237ms
+    frame  300/467  cov=41.8%  conf=0.264  t=255ms
+    frame  330/467  cov=41.9%  conf=0.296  t=255ms
+    frame  360/467  cov=42.1%  conf=0.284  t=240ms
+    frame  390/467  cov=38.7%  conf=0.280  t=240ms
+    frame  420/467  cov=0.0%  conf=0.000  t=237ms
+    frame  450/467  cov=0.0%  conf=0.000  t=253ms
+
+==================================================================
+  Results: YOLO26    |  Part 4.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                241.923   236.810   351.190
+  fps                                4.141     2.800     4.200
+  -- Model output --
+  road_coverage_pct                 10.833     0.000    42.970
+  mean_confidence                    0.079     0.000     0.432
+  num_detections                     0.266     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 5.mp4  (1920×1080  30.0 fps  453 frames)  capture=opencv
+    frame   30/453  cov=42.4%  conf=0.261  t=240ms
+    frame   60/453  cov=0.0%  conf=0.000  t=252ms
+    frame   90/453  cov=0.0%  conf=0.000  t=237ms
+    frame  120/453  cov=0.0%  conf=0.000  t=237ms
+    frame  150/453  cov=0.0%  conf=0.000  t=238ms
+    frame  180/453  cov=0.0%  conf=0.000  t=238ms
+    frame  210/453  cov=0.0%  conf=0.000  t=238ms
+    frame  240/453  cov=36.9%  conf=0.283  t=240ms
+    frame  270/453  cov=35.3%  conf=0.463  t=239ms
+    frame  300/453  cov=36.0%  conf=0.400  t=255ms
+    frame  330/453  cov=0.0%  conf=0.000  t=252ms
+    frame  360/453  cov=39.4%  conf=0.330  t=240ms
+    frame  390/453  cov=40.0%  conf=0.255  t=239ms
+    frame  420/453  cov=0.0%  conf=0.000  t=237ms
+    frame  450/453  cov=0.0%  conf=0.000  t=253ms
+
+==================================================================
+  Results: YOLO26    |  Part 5.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                241.816   236.970   262.620
+  fps                                4.142     3.800     4.200
+  -- Model output --
+  road_coverage_pct                 16.020     0.000    43.030
+  mean_confidence                    0.143     0.000     0.530
+  num_detections                     0.422     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 6.mp4  (1920×1080  30.0 fps  463 frames)  capture=opencv
+    frame   30/463  cov=37.5%  conf=0.354  t=241ms
+    frame   60/463  cov=0.0%  conf=0.000  t=237ms
+    frame   90/463  cov=0.0%  conf=0.000  t=237ms
+    frame  120/463  cov=0.0%  conf=0.000  t=237ms
+    frame  150/463  cov=0.0%  conf=0.000  t=252ms
+    frame  180/463  cov=37.6%  conf=0.307  t=240ms
+    frame  210/463  cov=38.3%  conf=0.320  t=239ms
+    frame  240/463  cov=38.4%  conf=0.316  t=239ms
+    frame  270/463  cov=0.0%  conf=0.000  t=238ms
+    frame  300/463  cov=38.2%  conf=0.363  t=255ms
+    frame  330/463  cov=0.0%  conf=0.000  t=237ms
+    frame  360/463  cov=0.0%  conf=0.000  t=237ms
+    frame  390/463  cov=0.0%  conf=0.000  t=237ms
+    frame  420/463  cov=41.2%  conf=0.303  t=255ms
+    frame  450/463  cov=0.0%  conf=0.000  t=237ms
+
+==================================================================
+  Results: YOLO26    |  Part 6.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                241.909   236.970   255.930
+  fps                                4.141     3.900     4.200
+  -- Model output --
+  road_coverage_pct                 15.126     0.000    41.980
+  mean_confidence                    0.127     0.000     0.531
+  num_detections                     0.410     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 7.mp4  (1920×1080  30.0 fps  456 frames)  capture=opencv
+    frame   30/456  cov=0.0%  conf=0.000  t=237ms
+    frame   60/456  cov=41.5%  conf=0.254  t=240ms
+    frame   90/456  cov=0.0%  conf=0.000  t=238ms
+    frame  120/456  cov=0.0%  conf=0.000  t=252ms
+    frame  150/456  cov=0.0%  conf=0.000  t=237ms
+    frame  180/456  cov=0.0%  conf=0.000  t=237ms
+    frame  210/456  cov=35.5%  conf=0.292  t=240ms
+    frame  240/456  cov=36.0%  conf=0.349  t=255ms
+    frame  270/456  cov=32.3%  conf=0.294  t=240ms
+    frame  300/456  cov=35.7%  conf=0.297  t=240ms
+    frame  330/456  cov=33.7%  conf=0.257  t=240ms
+    frame  360/456  cov=34.8%  conf=0.352  t=239ms
+    frame  390/456  cov=0.0%  conf=0.000  t=251ms
+    frame  420/456  cov=0.0%  conf=0.000  t=237ms
+    frame  450/456  cov=0.0%  conf=0.000  t=237ms
+
+==================================================================
+  Results: YOLO26    |  Part 7.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                241.642   236.970   260.690
+  fps                                4.143     3.800     4.200
+  -- Model output --
+  road_coverage_pct                 10.714     0.000    41.990
+  mean_confidence                    0.095     0.000     0.498
+  num_detections                     0.307     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 8.mp4  (1920×1080  30.0 fps  457 frames)  capture=opencv
+    frame   30/457  cov=0.0%  conf=0.000  t=238ms
+    frame   60/457  cov=0.0%  conf=0.000  t=238ms
+    frame   90/457  cov=0.0%  conf=0.000  t=237ms
+    frame  120/457  cov=0.0%  conf=0.000  t=252ms
+    frame  150/457  cov=0.0%  conf=0.000  t=237ms
+    frame  180/457  cov=0.0%  conf=0.000  t=237ms
+    frame  210/457  cov=0.0%  conf=0.000  t=237ms
+    frame  240/457  cov=0.0%  conf=0.000  t=237ms
+    frame  270/457  cov=0.0%  conf=0.000  t=237ms
+    frame  300/457  cov=0.0%  conf=0.000  t=237ms
+    frame  330/457  cov=0.0%  conf=0.000  t=239ms
+    frame  360/457  cov=0.0%  conf=0.000  t=238ms
+    frame  390/457  cov=0.0%  conf=0.000  t=237ms
+    frame  420/457  cov=0.0%  conf=0.000  t=252ms
+    frame  450/457  cov=33.2%  conf=0.350  t=240ms
+
+==================================================================
+  Results: YOLO26    |  Part 8.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                241.269   236.990   255.760
+  fps                                4.148     3.900     4.200
+  -- Model output --
+  road_coverage_pct                  4.028     0.000    42.230
+  mean_confidence                    0.040     0.000     0.493
+  num_detections                     0.116     0.000     1.000
+==================================================================
+
+
+  [VIDEO] Part 9.mp4  (1920×1080  30.0 fps  453 frames)  capture=opencv
+    frame   30/453  cov=37.4%  conf=0.265  t=240ms
+    frame   60/453  cov=37.9%  conf=0.410  t=239ms
+    frame   90/453  cov=40.6%  conf=0.331  t=240ms
+    frame  120/453  cov=0.0%  conf=0.000  t=237ms
+    frame  150/453  cov=40.6%  conf=0.256  t=254ms
+    frame  180/453  cov=35.8%  conf=0.258  t=254ms
+    frame  210/453  cov=36.4%  conf=0.399  t=240ms
+    frame  240/453  cov=36.2%  conf=0.320  t=239ms
+    frame  270/453  cov=35.2%  conf=0.456  t=239ms
+    frame  300/453  cov=35.0%  conf=0.321  t=239ms
+    frame  330/453  cov=0.0%  conf=0.000  t=252ms
+    frame  360/453  cov=0.0%  conf=0.000  t=237ms
+    frame  390/453  cov=0.0%  conf=0.000  t=237ms
+    frame  420/453  cov=0.0%  conf=0.000  t=248ms
+    frame  450/453  cov=0.0%  conf=0.000  t=238ms
+
+==================================================================
+  Results: YOLO26    |  Part 9.mp4
+------------------------------------------------------------------
+  Metric                              Mean       Min       Max
+------------------------------------------------------------------
+  -- Performance --
+  inference_time_ms                242.275   236.940   268.090
+  fps                                4.138     3.700     4.200
+  -- Model output --
+  road_coverage_pct                 21.076     0.000    41.040
+  mean_confidence                    0.188     0.000     0.521
+  num_detections                     0.574     0.000     1.000
+==================================================================
+
+
+CSV summary → /home/nvidia/Documents/jetson-benchmark/output/config-tests/yolo26-x-pytorch/yolo26/benchmark_all_yolo26.csv

@@ -20,3 +20,9 @@ yolo26-x-tensorrt
   Output: output/config-tests/yolo26-x-tensorrt
   Log: output/config-tests/logs/yolo26-x-tensorrt.log
 
+yolo26-x-pytorch
+  Status: SUCCESS
+  Elapsed: 2133s
+  Output: output/config-tests/yolo26-x-pytorch
+  Log: output/config-tests/logs/yolo26-x-pytorch.log
+
