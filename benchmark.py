@@ -47,6 +47,7 @@ BENCH_IMAGES = BENCH_ROOT / "images"
 BENCH_IMAGES_RAW = BENCH_IMAGES / "raw"
 BENCH_IMAGES_LABELED = BENCH_IMAGES / "labeled"
 BENCH_VIDEOS = BENCH_ROOT / "videos"
+MODEL_DIR = Path("models")
 
 JETSON_MODEL_HINTS = ("jetson", "orin", "nvidia")
 
@@ -266,7 +267,7 @@ def _build_segmentor(args, canonical_model: str):
                 raise SystemExit(
                     "\n[ERROR] SAM2.1 weights not found locally.\n"
                     f"  Expected: {wp}\n"
-                    "  Put the `.pt` file in the project directory or pass `--sam21-weights path/to/sam2.1_l.pt`.\n"
+                    "  Put the `.pt` file in models/ or pass `--sam21-weights path/to/sam2.1_l.pt`.\n"
                 )
             return sr.SAM21Segmentor(weights=str(wp), conf=args.conf)
         if canonical_model == "sam3":
@@ -275,16 +276,16 @@ def _build_segmentor(args, canonical_model: str):
                 raise SystemExit(
                     "\n[ERROR] SAM3 weights not found locally.\n"
                     f"  Expected: {wp}\n"
-                    "  Put the `.pt` file in the project directory or pass `--sam3-weights path/to/sam3.pt`.\n"
+                    "  Put the `.pt` file in models/ or pass `--sam3-weights path/to/sam3.pt`.\n"
                 )
             return sr.SAM3Segmentor(weights=str(wp), conf=args.conf, prompts=args.prompts)
         if canonical_model == "fastsam":
-            wp = Path(getattr(args, "fastsam_weights", "FastSAM-x.pt"))
+            wp = Path(getattr(args, "fastsam_weights", str(MODEL_DIR / "FastSAM-x.pt")))
             if not wp.exists():
                 raise SystemExit(
                     "\n[ERROR] FastSAM weights not found locally.\n"
                     f"  Expected: {wp}\n"
-                    "  Put the `.pt` file in the project directory or pass `--fastsam-weights path/to/FastSAM-x.pt`.\n"
+                    "  Put the `.pt` file in models/ or pass `--fastsam-weights path/to/FastSAM-x.pt`.\n"
                 )
             # Ultralytics FastSAM uses the YOLO API for segment tasks.
             seg = sr.YOLO26Segmentor(size=args.model_size, conf=args.conf, prompts=args.prompts)
@@ -293,12 +294,12 @@ def _build_segmentor(args, canonical_model: str):
             seg.model = YOLO(str(wp))
             return seg
         if canonical_model == "mobilesam":
-            wp = Path(getattr(args, "mobilesam_weights", "mobile_sam.pt"))
+            wp = Path(getattr(args, "mobilesam_weights", str(MODEL_DIR / "mobile_sam.pt")))
             if not wp.exists():
                 raise SystemExit(
                     "\n[ERROR] MobileSAM weights not found locally.\n"
                     f"  Expected: {wp}\n"
-                    "  Put the `.pt` file in the project directory or pass `--mobilesam-weights path/to/mobile_sam.pt`.\n"
+                    "  Put the `.pt` file in models/ or pass `--mobilesam-weights path/to/mobile_sam.pt`.\n"
                 )
             # MobileSAM is a SAM-style model; use Ultralytics SAM wrapper.
             from ultralytics import SAM  # pyright: ignore[reportMissingImports]
@@ -846,10 +847,10 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Path to TensorRT .engine file (used when --yolo-backend tensorrt).",
     )
-    run.add_argument("--fastsam-weights", default="FastSAM-x.pt", help="Path to local FastSAM weights .pt.")
-    run.add_argument("--mobilesam-weights", default="mobile_sam.pt", help="Path to local MobileSAM weights .pt.")
-    run.add_argument("--sam3-weights", default="sam3.pt", help="Path to sam3.pt.")
-    run.add_argument("--sam21-weights", default="sam2.1_l.pt", help="Path to sam2.1_l.pt.")
+    run.add_argument("--fastsam-weights", default=str(MODEL_DIR / "FastSAM-x.pt"), help="Path to local FastSAM weights .pt.")
+    run.add_argument("--mobilesam-weights", default=str(MODEL_DIR / "mobile_sam.pt"), help="Path to local MobileSAM weights .pt.")
+    run.add_argument("--sam3-weights", default=str(MODEL_DIR / "sam3.pt"), help="Path to sam3.pt.")
+    run.add_argument("--sam21-weights", default=str(MODEL_DIR / "sam2.1_l.pt"), help="Path to sam2.1_l.pt.")
     run.add_argument(
         "--hardware",
         default="jetson",
@@ -896,10 +897,10 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Path to TensorRT .engine file (used when --yolo-backend tensorrt).",
     )
-    allcmd.add_argument("--fastsam-weights", default="FastSAM-x.pt", help="Path to local FastSAM weights .pt.")
-    allcmd.add_argument("--mobilesam-weights", default="mobile_sam.pt", help="Path to local MobileSAM weights .pt.")
-    allcmd.add_argument("--sam3-weights", default="sam3.pt", help="Path to sam3.pt.")
-    allcmd.add_argument("--sam21-weights", default="sam2.1_l.pt", help="Path to sam2.1_l.pt.")
+    allcmd.add_argument("--fastsam-weights", default=str(MODEL_DIR / "FastSAM-x.pt"), help="Path to local FastSAM weights .pt.")
+    allcmd.add_argument("--mobilesam-weights", default=str(MODEL_DIR / "mobile_sam.pt"), help="Path to local MobileSAM weights .pt.")
+    allcmd.add_argument("--sam3-weights", default=str(MODEL_DIR / "sam3.pt"), help="Path to sam3.pt.")
+    allcmd.add_argument("--sam21-weights", default=str(MODEL_DIR / "sam2.1_l.pt"), help="Path to sam2.1_l.pt.")
     allcmd.add_argument(
         "--hardware",
         default="jetson",

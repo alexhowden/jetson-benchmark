@@ -123,7 +123,7 @@ SAM3 weights require manual download:
 
 1. Go to <https://huggingface.co/facebook/sam3> and click **"Request access"**.
 2. Once approved, go to the `Files and versions` tab and download **`sam3.pt`** (~3.4 GB).
-3. Place `sam3.pt` in the project root (same folder as `segment_road.py`).
+3. Place `sam3.pt` in `models/`.
 
 ---
 
@@ -213,8 +213,8 @@ Reports are saved as `output/<model>/metrics_<model>.json`.
 | `--yolo-weights`  | auto          | Optional YOLO weights/engine path                                     |
 | `--yolo-backend`  | `pytorch`     | YOLO backend: `pytorch` / `tensorrt`                                  |
 | `--yolo-engine`   | none          | TensorRT engine path (used with `--yolo-backend tensorrt`)            |
-| `--sam3-weights`  | `sam3.pt`     | Path to SAM3 weights _(ignored for YOLO26 and SAM2.1)_                |
-| `--sam21-weights` | `sam2.1_l.pt` | Path to SAM2.1 weights — auto-downloaded if not present               |
+| `--sam3-weights`  | `models/sam3.pt`     | Path to SAM3 weights _(ignored for YOLO26 and SAM2.1)_                |
+| `--sam21-weights` | `models/sam2.1_l.pt` | Path to SAM2.1 weights — auto-downloaded if not present               |
 | `--video-writer`  | `auto`        | Video output backend: `auto` / `opencv` / `gstreamer`                 |
 | `--video-capture` | `auto`        | Video input backend: `auto` / `opencv` / `gstreamer`                  |
 | `--report`        | off           | Save JSON metrics report to the model output directory                |
@@ -282,11 +282,11 @@ This repository tracks **benchmark metrics + thresholds** so you can compare mod
 
 Models under test:
 
-- **SAM3**: `sam3.pt` (local weights)
-- **SAM2.1-L**: `sam2.1_l.pt` (local weights)
-- **FastSAM**: `FastSAM-x.pt` (local weights)
-- **MobileSAM**: `mobile_sam.pt` (local weights)
-- **YOLOE-26 Seg**: `yoloe-26{n|s|m|l|x}-seg.pt` (local weights)
+- **SAM3**: `models/sam3.pt` (local weights)
+- **SAM2.1-L**: `models/sam2.1_l.pt` (local weights)
+- **FastSAM**: `models/FastSAM-x.pt` (local weights)
+- **MobileSAM**: `models/mobile_sam.pt` (local weights)
+- **YOLOE-26 Seg**: `models/yoloe-26{n|s|m|l|x}-seg.pt` (local weights)
 
 ### Performance (always reported)
 
@@ -384,3 +384,38 @@ bash scripts/run_all_benchmarks.sh --save-outputs
 ```
 
 The script uses `benchmark.py all` so outputs and metrics remain end-to-end (inference + overlay + write).
+
+### YOLO-only config matrix (run_all_configs.sh)
+
+Use this script when you only want YOLOE-26 benchmark variants (no SAM/FastSAM/MobileSAM).
+
+```bash
+# Run all YOLO configs (n/x, pytorch/tensorrt)
+bash scripts/run_all_configs.sh
+
+# Skip nano model runs
+bash scripts/run_all_configs.sh --skip-n
+
+# Skip x model runs
+bash scripts/run_all_configs.sh --skip-x
+
+# Run only TensorRT variants
+bash scripts/run_all_configs.sh --only-tensorrt
+
+# Run only PyTorch variants
+bash scripts/run_all_configs.sh --only-pytorch
+```
+
+This script runs:
+
+- `python benchmark.py all --model yolo26 --model-size n --yolo-backend pytorch`
+- `python benchmark.py all --model yolo26 --model-size n --yolo-backend tensorrt`
+- `python benchmark.py all --model yolo26 --model-size x --yolo-backend pytorch`
+- `python benchmark.py all --model yolo26 --model-size x --yolo-backend tensorrt`
+
+Results are saved under `output/config-tests/`:
+
+- `summary_<timestamp>.txt`
+- `comparison_<timestamp>.csv`
+- per-config logs in `output/config-tests/logs/`
+- per-config full CSV files like `yolo26-n-pytorch_full.csv`

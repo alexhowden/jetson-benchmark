@@ -19,6 +19,16 @@
 
 set -e  # Exit on error
 
+# Prefer python3 in containers where `python` may not be installed.
+if command -v python3 >/dev/null 2>&1; then
+    PYTHON_BIN="python3"
+elif command -v python >/dev/null 2>&1; then
+    PYTHON_BIN="python"
+else
+    echo "[ERROR] Neither python3 nor python was found in PATH"
+    exit 1
+fi
+
 # Parse arguments
 SKIP_N=false
 SKIP_X=false
@@ -99,7 +109,7 @@ run_benchmark() {
     echo "--------------------------------------------------------------------------------"
 
     # Build command (imgsz=640 default, video-capture=opencv)
-    local CMD="python benchmark.py all --model yolo26 --model-size ${MODEL_SIZE} --yolo-backend ${BACKEND} --output ${OUTPUT_DIR} --video-capture opencv"
+    local CMD="${PYTHON_BIN} benchmark.py all --model yolo26 --model-size ${MODEL_SIZE} --yolo-backend ${BACKEND} --output ${OUTPUT_DIR} --video-capture opencv"
 
     echo "Command: ${CMD}"
     echo ""

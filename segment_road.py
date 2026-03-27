@@ -28,7 +28,7 @@ Notes
 - YOLO26 weights are downloaded automatically on first run.
 - SAM3 weights (sam3.pt, ~3.4 GB) must be requested from HuggingFace:
     https://huggingface.co/facebook/sam3
-  Place the downloaded sam3.pt in the working directory (or use --sam3-weights).
+    Place the downloaded sam3.pt in models/ (or use --sam3-weights).
 - If SAM3 raises "TypeError: 'SimpleTokenizer' object is not callable":
     pip uninstall clip -y
     pip install git+https://github.com/ultralytics/CLIP.git
@@ -45,6 +45,7 @@ import numpy as np
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".webp"}
 VIDEO_EXTS  = {".mp4", ".avi", ".mov", ".mkv", ".webm"}
+MODEL_DIR = Path("models")
 
 DEFAULT_PROMPTS = [
     "traversable road",
@@ -79,6 +80,17 @@ def detect_jetson() -> bool:
     if release:
         return True
     return False
+
+
+def resolve_model_path(name: str) -> Path:
+    """Resolve a model filename to models/ when present, else keep original."""
+    p = Path(name)
+    if p.exists():
+        return p
+    alt = MODEL_DIR / name
+    if alt.exists():
+        return alt
+    return p
 
 
 def build_video_writer(out_path: Path, fps: float, size: tuple[int, int], backend: str = "auto"):
@@ -440,7 +452,8 @@ class YOLO26Segmentor:
     ):
         from ultralytics import YOLO
 
-        name = weights or f"yoloe-26{size}-seg.pt"
+        name_path = resolve_model_path(weights) if weights else resolve_model_path(f"yoloe-26{size}-seg.pt")
+        name = str(name_path)
         backend = backend.lower().strip()
 
         self.conf = conf
@@ -456,7 +469,7 @@ class YOLO26Segmentor:
             print(f"[YOLO26] Setting text classes: {self.prompts}")
             base.set_classes(self.prompts)
 
-            engine_path = Path(engine) if engine else Path(str(name)).with_suffix(".engine")
+            engine_path = resolve_model_path(engine) if engine else Path(str(name_path)).with_suffix(".engine")
             if engine_path.exists():
                 print(f"[YOLO26] Loading existing TensorRT engine {engine_path} ...")
                 print(f"[YOLO26] [WARN] Using existing engine - if text classes changed, delete {engine_path} to re-export")
@@ -499,14 +512,14 @@ class SAM3Segmentor:
     Uses SAM3SemanticPredictor for images (text prompt) and
     SAM3VideoSemanticPredictor for videos (temporal tracking).
     """
-    def __init__(self, weights: str = "sam3.pt", conf: float = 0.25, prompts: list = None):
+    def __init__(self, weights: str = "models/sam3.pt", conf: float = 0.25, prompts: list = None):
         weights_path = Path(weights)
 
         if not weights_path.exists():
             sys.exit(
                 f"\n[ERROR] SAM3 weights not found: {weights}\n"
                 "  1. Request access at: https://huggingface.co/facebook/sam3\n"
-                "  2. Download sam3.pt and place it in the working directory.\n"
+                "  2. Download sam3.pt and place it in models/.\n"
                 "  3. Or pass the path via --sam3-weights /path/to/sam3.pt\n"
             )
 
@@ -549,7 +562,7 @@ class SAM21Segmentor:
     automatically by Ultralytics on first use (~224 MB).
     """
 
-    WEIGHTS = "sam2.1_l.pt"
+    WEIGHTS = "models/sam2.1_l.pt"
     # Relative position of the road prompt point (fraction of frame dims)
     POINT_X = 0.50
     POINT_Y = 0.75
@@ -765,12 +778,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path to TensorRT .engine file (used when --yolo-backend tensorrt).",
     )
     p.add_argument(
-        "--sam3-weights", default="sam3.pt",
-        help="Path to sam3.pt weights file              [default: sam3.pt]",
+        "--sam3-weights", default="models/sam3.pt",
+        help="Path to sam3.pt weights file              [default: models/sam3.pt]",
     )
     p.add_argument(
-        "--sam21-weights", default="sam2.1_l.pt",
-        help="Path to SAM 2.1 weights (auto-downloaded) [default: sam2.1_l.pt]",
+        "--sam21-weights", default="models/sam2.1_l.pt",
+        help="Path to SAM 2.1 weights (auto-downloaded) [default: models/sam2.1_l.pt]",
     )
     p.add_argument(
         "--video-writer",

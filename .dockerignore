@@ -1,0 +1,10 @@
+.git
+.gitignore
+.venv
+__pycache__
+output
+benchmark/videos
+*.pyc
+*.pyo
+*.pyd
+*.swp

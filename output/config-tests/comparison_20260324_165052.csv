@@ -1,5 +1,0 @@
-config,model_size,backend,status,elapsed_sec,img_mean_iou,img_mean_f1,img_pixel_acc,img_fnr,img_fpr,img_inference_ms,img_fps,vid_temporal_iou,vid_no_detect_rate,vid_stability,vid_inference_ms,vid_fps,img_pass,vid_pass
-yolo26-n-tensorrt,n,tensorrt,SUCCESS,855,0.2881,0.4279,0.7143,0.6484,0.1089,0.00,0.00,0.7567,0.3145,0.7567,21.91,45.94,False,False
-yolo26-n-pytorch,n,pytorch,SUCCESS,648,0.5870,0.6757,0.8238,0.3079,0.1125,0.00,0.00,0.7689,0.5439,0.7689,59.03,16.96,False,False
-yolo26-x-tensorrt,x,tensorrt,SUCCESS,2182,0.3278,0.4774,0.7514,0.6100,0.0731,0.00,0.00,0.9277,0.9227,0.9277,103.29,9.71,False,False
-yolo26-x-pytorch,x,pytorch,SUCCESS,2133,0.7131,0.7851,0.8977,0.2109,0.0504,0.00,0.00,0.8610,0.7645,0.8610,245.07,4.10,False,False
