@@ -15,6 +15,9 @@
 #   ./run_all_configs.sh --skip-x          # Skip YOLO-26x tests
 #   ./run_all_configs.sh --only-tensorrt   # Only test TensorRT backend
 #   ./run_all_configs.sh --only-pytorch    # Only test PyTorch backend
+#   ./run_all_configs.sh --rebuild-engines # Force TensorRT engine re-export
+#   ./run_all_configs.sh --trt-half        # Use FP16 for TensorRT export (with --rebuild-engines)
+#   ./run_all_configs.sh --save-outputs    # Save annotated image/video outputs
 #
 
 set -e  # Exit on error
@@ -34,6 +37,9 @@ SKIP_N=false
 SKIP_X=false
 ONLY_TENSORRT=false
 ONLY_PYTORCH=false
+REBUILD_ENGINES=false
+TRT_HALF=false
+SAVE_OUTPUTS=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -53,9 +59,21 @@ while [[ $# -gt 0 ]]; do
             ONLY_PYTORCH=true
             shift
             ;;
+        --rebuild-engines)
+            REBUILD_ENGINES=true
+            shift
+            ;;
+        --trt-half)
+            TRT_HALF=true
+            shift
+            ;;
+        --save-outputs)
+            SAVE_OUTPUTS=true
+            shift
+            ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--skip-n] [--skip-x] [--only-tensorrt] [--only-pytorch]"
+            echo "Usage: $0 [--skip-n] [--skip-x] [--only-tensorrt] [--only-pytorch] [--rebuild-engines] [--trt-half] [--save-outputs]"
             exit 1
             ;;
     esac
@@ -110,6 +128,16 @@ run_benchmark() {
 
     # Build command (imgsz=640 default, video-capture=opencv)
     local CMD="${PYTHON_BIN} benchmark.py all --model yolo26 --model-size ${MODEL_SIZE} --yolo-backend ${BACKEND} --output ${OUTPUT_DIR} --video-capture opencv"
+    if [ "${BACKEND}" = "tensorrt" ] && [ "${REBUILD_ENGINES}" = true ]; then
+        # Keep TensorRT comparisons fair by rebuilding engine from current prompts/settings.
+        CMD+=" --yolo-rebuild-engine"
+        if [ "${TRT_HALF}" = true ]; then
+            CMD+=" --yolo-trt-half"
+        fi
+    fi
+    if [ "${SAVE_OUTPUTS}" = true ]; then
+        CMD+=" --save-outputs"
+    fi
 
     echo "Command: ${CMD}"
     echo ""

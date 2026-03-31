@@ -309,15 +309,13 @@ def overlay_mask(frame: np.ndarray, mask: np.ndarray) -> np.ndarray:
         return frame.copy()
 
     out = frame.copy()
-    mask_u8 = mask.astype(np.uint8)
-    x, y, w, h = cv2.boundingRect(mask_u8)
-    if w > 0 and h > 0:
-        roi = out[y : y + h, x : x + w]
-        roi_mask = mask[y : y + h, x : x + w]
-        roi_overlay = roi.copy()
-        roi_overlay[roi_mask] = MASK_BGR
-        roi[:] = cv2.addWeighted(roi_overlay, MASK_ALPHA, roi, 1.0 - MASK_ALPHA, 0)
+    overlay = frame.copy()
+    
+    # Standard full-frame blend
+    overlay[mask.astype(bool)] = MASK_BGR
+    cv2.addWeighted(overlay, MASK_ALPHA, out, 1.0 - MASK_ALPHA, 0, out)
 
+    mask_u8 = mask.astype(np.uint8)
     contours, _ = cv2.findContours(mask_u8, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cv2.drawContours(out, contours, -1, CONTOUR_BGR, 2)
 
@@ -449,6 +447,8 @@ class YOLO26Segmentor:
         weights: str | None = None,
         backend: str = "pytorch",
         engine: str | None = None,
+        rebuild_engine: bool = False,
+        trt_half: bool = False,
     ):
         from ultralytics import YOLO
 
@@ -470,16 +470,18 @@ class YOLO26Segmentor:
             base.set_classes(self.prompts)
 
             engine_path = resolve_model_path(engine) if engine else Path(str(name_path)).with_suffix(".engine")
-            if engine_path.exists():
+            if engine_path.exists() and not rebuild_engine:
                 print(f"[YOLO26] Loading existing TensorRT engine {engine_path} ...")
                 print(f"[YOLO26] [WARN] Using existing engine - if text classes changed, delete {engine_path} to re-export")
                 self.model = YOLO(str(engine_path))
             else:
+                if engine_path.exists() and rebuild_engine:
+                    print(f"[YOLO26] Rebuilding TensorRT engine (forced): {engine_path}")
                 print(
                     f"[YOLO26] Exporting TensorRT engine from {name} "
-                    f"(imgsz={imgsz}, half=True, first run may take time) ..."
+                    f"(imgsz={imgsz}, half={trt_half}, first run may take time) ..."
                 )
-                exported = base.export(format="engine", half=True, imgsz=imgsz)
+                exported = base.export(format="engine", half=trt_half, imgsz=imgsz)
                 exported_path = Path(str(exported))
                 print(f"[YOLO26] TensorRT engine exported: {exported_path}")
                 print(f"[YOLO26] Loading TensorRT engine {exported_path} ...")

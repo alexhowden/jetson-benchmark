@@ -260,6 +260,8 @@ def _build_segmentor(args, canonical_model: str):
                 weights=getattr(args, "yolo_weights", None),
                 backend=getattr(args, "yolo_backend", "pytorch"),
                 engine=getattr(args, "yolo_engine", None),
+                rebuild_engine=getattr(args, "yolo_rebuild_engine", False),
+                trt_half=getattr(args, "yolo_trt_half", False),
             )
         if canonical_model == "sam21":
             wp = Path(args.sam21_weights)
@@ -847,6 +849,16 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Path to TensorRT .engine file (used when --yolo-backend tensorrt).",
     )
+    run.add_argument(
+        "--yolo-rebuild-engine",
+        action="store_true",
+        help="Force re-export of TensorRT engine instead of reusing an existing .engine file.",
+    )
+    run.add_argument(
+        "--yolo-trt-half",
+        action="store_true",
+        help="Export TensorRT engine in FP16 (default is FP32 for better parity).",
+    )
     run.add_argument("--fastsam-weights", default=str(MODEL_DIR / "FastSAM-x.pt"), help="Path to local FastSAM weights .pt.")
     run.add_argument("--mobilesam-weights", default=str(MODEL_DIR / "mobile_sam.pt"), help="Path to local MobileSAM weights .pt.")
     run.add_argument("--sam3-weights", default=str(MODEL_DIR / "sam3.pt"), help="Path to sam3.pt.")
@@ -896,6 +908,16 @@ def build_parser() -> argparse.ArgumentParser:
         "--yolo-engine",
         default=None,
         help="Path to TensorRT .engine file (used when --yolo-backend tensorrt).",
+    )
+    allcmd.add_argument(
+        "--yolo-rebuild-engine",
+        action="store_true",
+        help="Force re-export of TensorRT engine instead of reusing an existing .engine file.",
+    )
+    allcmd.add_argument(
+        "--yolo-trt-half",
+        action="store_true",
+        help="Export TensorRT engine in FP16 (default is FP32 for better parity).",
     )
     allcmd.add_argument("--fastsam-weights", default=str(MODEL_DIR / "FastSAM-x.pt"), help="Path to local FastSAM weights .pt.")
     allcmd.add_argument("--mobilesam-weights", default=str(MODEL_DIR / "mobile_sam.pt"), help="Path to local MobileSAM weights .pt.")
