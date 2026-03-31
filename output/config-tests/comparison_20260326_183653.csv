@@ -1,0 +1,2 @@
+config,model_size,backend,status,elapsed_sec,img_mean_iou,img_mean_f1,img_pixel_acc,img_fnr,img_fpr,img_inference_ms,img_fps,vid_temporal_iou,vid_no_detect_rate,vid_stability,vid_inference_ms,vid_fps,img_pass,vid_pass
+yolo26-n-tensorrt,n,tensorrt,FAILED,7,0,0,0,0,0,0,0,0,0,0,0,0,False,False

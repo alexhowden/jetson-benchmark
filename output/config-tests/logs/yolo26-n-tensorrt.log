@@ -1,0 +1,16 @@
+WARNING ⚠️ user config directory '/root/.config/Ultralytics' is not writable, using '/tmp/Ultralytics'. Set YOLO_CONFIG_DIR to override.
+Creating new Ultralytics Settings v0.0.6 file ✅ 
+View Ultralytics Settings with 'yolo settings' or at '/tmp/Ultralytics/settings.json'
+Update Settings with 'yolo settings key=value', i.e. 'yolo settings runs_dir=path/to/dir'. For help see https://docs.ultralytics.com/quickstart/#ultralytics-settings.
+[YOLO26] Loading models/yoloe-26n-seg.pt for TensorRT export ...
+[YOLO26] Setting text classes: ['traversable road', 'dirt road', 'off-road trail', 'drivable terrain', 'gravel path']
+
+[ERROR] Missing Python dependency required by the selected model.
+  Missing: wcwidth
+
+Fix:
+  conda activate offroad-seg
+  pip install -r requirements.txt
+
+See also: README.md → 'Environment Setup (Conda)'
+
